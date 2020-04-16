@@ -222,7 +222,7 @@
 ## 宿題: <span style="text-transform:none">Raspberry Pi</span><br />のセットアップ
 
 * Raspberry Piを入手して<span style="color:red">Ubuntu</span>をインストールのこと
-    * 昨年までは、最初はRaspbianでしたが今年からは最初からUbuntuで
+    * 昨年までは、最初はRaspbianでしたが最初からUbuntuで
 	* 方法
 	    * [Install Ubuntu Server on a Raspberry Pi 2, 3 or 4](https://ubuntu.com/download/raspberry-pi)に行く
 	    * 持っているRaspberry Piのバージョンに合った新しいバージョンのUbuntu（なるべく64bit）をダウンロード
