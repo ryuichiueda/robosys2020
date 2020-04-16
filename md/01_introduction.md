@@ -87,6 +87,8 @@
     * 性能というよりもプラットフォームとして非常に優秀
         * 使ったことがある腕自慢の人でも、ちゃんとプラットフォームとしての視点で使っていただろうか？
 
+<img width="35%" src="md/images/raspi4.jpeg" />
+
 ---
 
 ## <span style="text-transform:none">Raspberry Pi</span>について詳しく
@@ -100,6 +102,46 @@
         * 安価でハードの制御ができるようなシングルボードPCが作れないか？
     * 2009年: Raspberry Pi Foundation設立
         * Raspberry Piを販売（2016年に1000万台販売）
+
+---
+
+## <span style="text-transform:none">Raspberry Pi</span>の入出力
+
+* 右図: Raspberry Pi 4
+    * 電源入力: USB Type-C
+    * ディスプレイへ出力: マイクロHDMI x2
+    * ストレージ: microSDカード
+    * 有線LANポート
+    * USBポート x4
+    * 40ピンのブロック
+        * 「GPIOピン」と呼ばれる
+    * 他: 専用カメラの取り付け端子等
+
+<img width="35%" src="md/images/raspi4.jpeg" />
+
+---
+
+## GPIOピンの構成
+
+* Raspberry Pi 2からPi 4まで変わってない<br />$ $
+* 配置（Model Bのもの）: http://pinout.xyz
+    * 電源: 3.3V、5V
+    * GND
+    * GPIOピン: 27
+        * うち何本かがI2C、SPI、UARTも使える
+    * I2C ID EEPROM用ピン<br />$ $
+* A/D変換機能は付いていない
+
+
+---
+
+## CPU・メモリ・ストレージ
+
+* Raspberry Pi 4の場合
+    * CPU: 1.5GHz Cortex-A72 ARMv8 64bit（4コア）
+    * DRAM: 1GB, 2GB, 4GBのいずれか。LPDDR4 SDRAM
+    * ストレージ: microSD
+         * 細かい規格のちがいに注意
 
 
 ---
@@ -145,7 +187,7 @@
 * ノートPC
     * 役割1: Raspberry Piとssh通信
     * 役割2: Raspberry Piと繋がらないときの保険
-        * 仮想マシン上 or ネイティブなUbuntu
+        * WSL or 仮想マシン上 or ネイティブなUbuntu
         * Ubuntu 18.04 LTSあるいはUbuntu 20.04 LTSを想定
 
 ---
@@ -223,68 +265,15 @@
 
 * Raspberry Piを入手して<span style="color:red">Ubuntu</span>をインストールのこと
     * 昨年までは、最初はRaspbianでしたが最初からUbuntuで
+	* MicroSDカードは16GBで十分（たぶん32GBまでは問題ないけどそれ以上だと難しい）
 	* 方法
-	    * [Install Ubuntu Server on a Raspberry Pi 2, 3 or 4](https://ubuntu.com/download/raspberry-pi)に行く
-	    * 持っているRaspberry Piのバージョンに合った新しいバージョンのUbuntu（なるべく64bit）をダウンロード
-	    * ダウンロードしたファイルの中身を[Etcher](https://www.balena.io/etcher/)でMicroSDカードに書き込む
-	    * モニタかネットワーク越しで動作確認
+	    * [Twitterに書きました](https://twitter.com/ryuichiueda/status/1250644188992962560)
+	    * ソフトウェアをダウンロードするサイト
+	        * [Install Ubuntu Server on a Raspberry Pi 2, 3 or 4](https://ubuntu.com/download/raspberry-pi)
+	        * [Etcher](https://www.balena.io/etcher/)
     * 諸注意
         * デスクトップ環境は使いません
         * ギブアップしてもケアしますから脱落の必要はナシ
-
----
-
-## <span style="text-transform:none">Raspberry Pi</span>の入出力
-
-* 右図: Raspberry Pi 2 Model B
-* 電源入力: MicroUSB
-* ディスプレイへ出力: HDMI
-* ストレージ: microSDカード
-* 有線LANポート
-* USBポート
-* **40ピンのブロック**
-    * 「GPIOピン」と呼ばれる
-* 他: 専用カメラの取り付け端子等
-
-<img width="35%" src="https://lab.ueda.tech/wp-content/uploads/2016/08/raspberrypi.png" />
-
----
-
-## GPIOピンの構成
-
-* Raspberry Pi 2からRaspberry Pi 3 B+まで変わってない<br />$ $
-* 配置（Model Bのもの）: http://pinout.xyz
-    * 電源: 3.3V、5V
-    * GND
-    * GPIOピン: 27
-        * うち何本かがI2C、SPI、UARTも使える
-    * I2C ID EEPROM用ピン<br />$ $
-* A/D変換機能は付いていない
-
-
----
-
-## CPU・メモリ・ストレージ
-
-* Raspberry Pi 3 B+
-    * CPU: 1.4GHz Cortex-A53 ARMv8 64bit（4コア）
-    * DRAM: 1GB DDR2 450MHz
-    * ストレージ: microSD
-         * 細かい規格の制限や相性等に注意
-         * 16GBまではトラブルが少ない
-
-
----
-
-## <span style="text-transform:none">Raspberry Pi</span>のソフトウェア
-
-* Linuxが標準
-    * Raspbian
-    * Ubuntu<br />$ $
-* ロボットのコントローラとしてのLinux
-    * 欠点: マイコンのように単純なリアルタイム制御ができない
-    * 長所: 開発時、運用時にインターネットとシームレスに接続
-    * これから講義でいろいろやります
 
 ---
 
@@ -292,3 +281,10 @@
 
 * 教室でRaspberry Piを使います
     * ノートPCにLANケーブルで接続してSSHから操作
+
+---
+
+## 作業
+
+* Windowsの人はWSLをインストールしましょう
+    * [手順](https://ryuichiueda.github.io/ShellGeiData/WSL20200328.html)
