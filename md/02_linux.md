@@ -2,9 +2,7 @@
 
 上田 隆一
 
-2019年9月27日@千葉工業大学
-
-
+千葉工業大学
 
 ---
 
@@ -21,18 +19,18 @@
   * ラズパイ -> 有線LAN -> ノートPC -> ノートPCのWiFi -> インターネット
   * つまりノートPCをルータにする
  
-<img width="35%" src="https://pbs.twimg.com/media/DKZLU64U8AEdULI.jpg" />
+<img width="35%" src="./md/images/raspi4_connect.jpeg" />
 
 ---
 
 ## ノートPCのOS別設定方法
 
-* Windows: https://blog.ueda.tech/?p=8694
+* Windows: https://twitter.com/ryuichiueda/status/1250644188992962560
+* Mac: https://b.ueda.tech/?post=08717
   * 拙ブログですみません
-* Mac: https://blog.ueda.tech/?p=8717
-  * こちらも拙ブログですみません
 * ラズパイのIPの調べ方
   * `$ nmap -sP <有線側のセグメント>`
+  * `$ arp -a
 * Linux: DHCPを立てるのが面倒なので割愛
 
 ---
