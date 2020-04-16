@@ -221,16 +221,16 @@
 
 ## 宿題: <span style="text-transform:none">Raspberry Pi</span><br />のセットアップ
 
-* Raspberry Piを入手してRaspbianをインストールのこと
-    * 初心者向けの指示: [NOOBS](https://www.raspberrypi.org/downloads/noobs/)を使ってRaspbianをインストールのこと
-        * 手順: https://b.ueda.tech/?post=20180905_raspi
-        * 他の情報
-            * ネット上に山のように情報
-            * 「これ1冊で・・・」に詳しい解説
+* Raspberry Piを入手して<span style="color:red">Ubuntu</span>をインストールのこと
+    * 昨年までは、最初はRaspbianでしたが今年からは最初からUbuntuで
+	* 方法
+	    * [Install Ubuntu Server on a Raspberry Pi 2, 3 or 4](https://ubuntu.com/download/raspberry-pi)に行く
+	    * 持っているRaspberry Piのバージョンに合った新しいバージョンのUbuntu（なるべく64bit）をダウンロード
+	    * ダウンロードしたファイルの中身を[Etcher](https://www.balena.io/etcher/)でMicroSDカードに書き込む
+	    * モニタかネットワーク越しで動作確認
     * 諸注意
         * デスクトップ環境は使いません
-        * ギブアップしてもケアしますから講義には来てください。
-        * 慣れている人はUbuntuでもよい
+        * ギブアップしてもケアしますから脱落の必要はナシ
 
 ---
 
