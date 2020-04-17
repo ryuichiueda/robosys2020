@@ -115,20 +115,6 @@ systemd─┬─ModemManager───2*[{ModemManager}]
 
 ---
 
-## ファイルの編集
-
-ロボットを動かしたいときに最初にやること
-
-* 「エディタ」を使う
-    * ここではCLI（command line interface）でテキストファイルを読み書きするものを指す
-        * EmacsとVimがメジャー
-        * 特にここでは説明しません
-    * 設定ファイルやプログラム、文章までなんでもこれで書く
-    * 練習コマンドがあるのでそれで練習を
-        * Vimにはvimtutorというコマンドがあり、最初はこれをやるのが一番良い
-
----
-
 ## ファイルの操作
 
 * 生成、移動、削除、プログラムの実行・・・
@@ -202,14 +188,7 @@ catやfindの結果をgrepしたり、findの結果を止めて眺めたりと�
 
 ---
 
-## ファイルの操作
-
-* ls, mv, rm, cp, mkdir, rmdir
-  * 口頭で説明します
-
----
-
-## <span style="text-transform:none">man
+## <span style="text-transform:none">man</span>
 
 * マニュアルコマンド
   ```bash
@@ -240,29 +219,29 @@ catやfindの結果をgrepしたり、findの結果を止めて眺めたりと�
 ## <span style="text-transform:none">ping
 
 * 通信先にパケットが届くか確認する時によく使う
-* `$ ping 8.8.8.8`
+* 例1: 
+```
+$ ping 8.8.8.8
+```
   * GoogleのDNSにパケットが届くか確認
   * インターネットに出られるか確認する時によく使用
-* `$ ping www.yahoo.co.jp`
+* 例2: 
+```
+$ ping www.yahoo.co.jp
+```
   * ドメイン名をIPに変換できるか（名前解決）を確認する時に使用
-* `$ ping 192.168.1.254`
-  * 192.168.1.254に届くか確認
-  * （192.168.1.254はルーターっぽいIPアドレス）
-* たまにセキュリティーのために先方がふさがっていることがある
 
 ---
 
-## <span style="text-transform:none">ip, ifconfig
+## <span style="text-transform:none">ip
 
 * ネットワークの設定の確認
-* ifconfig: 古い確認方法
-  ```bash
-  $ ifconfig
-  ```
-* ip: 新しい方法
   ```bash
   $ ip addr show    #IPアドレス等の確認
+  $ ip a            #略記
   ```
+* 問題: IPアドレスの行を抽出してみましょう
+    * grepと組み合わせて
 
 ---
 
@@ -316,10 +295,22 @@ catやfindの結果をgrepしたり、findの結果を止めて眺めたりと�
 
 ---
 
+## ファイルの編集
+
+* 「エディタ」を使う
+    * ここではCLI（command line interface）でテキストファイルを読み書きするものを指す
+        * EmacsとVimがメジャー
+        * 特にここでは説明しません
+    * 設定ファイルやプログラム、文章までなんでもこれで書く
+    * 練習コマンドがあるのでそれで練習を
+        * Vimにはvimtutorというコマンドがあり、最初はこれをやるのが一番良い
+
+
+---
+
 ## プログラムのコンパイル
 
 * 次のようなC言語のファイルhoge.cを作ってみましょう
-  * 端末のエディタがまだ使えない人はこの資料のコピペやscp等を駆使のこと
   ```c
   #include <stdio.h>
   int main(int argc, char const* argv[]){
