@@ -25,8 +25,8 @@
 
 ## ノートPCのOS別設定方法
 
-* Windows: https://twitter.com/ryuichiueda/status/1250644188992962560
-* Mac: https://b.ueda.tech/?post=08717
+* [Windows](https://twitter.com/ryuichiueda/status/1250644188992962560)
+* [Mac](https://b.ueda.tech/?post=08717)
   * 拙ブログですみません
 * ラズパイのIPの調べ方
   * `$ nmap -sP <有線側のセグメント>`
@@ -35,64 +35,129 @@
 
 ---
 
-## <span style="text-transform:none">Linuxの世界
+## ログインしてみましょう
 
-* ほぼ全てテキストファイルでできている
-  * 設定ファイル等
-  * /etc下のファイルを見てみましょう
-    * $ cat /etc/passwd
-* どうやって見る？編集する？
-  * エディタ
-  * コマンド
-* エディタとコマンドは使えないとかなりストレス
-    * 自転車と一緒で使えると自然に使えるようになるので我慢して慣れられるかどうかで今後が変わる
+* MacやLinuxならTerminal、WindowsならWSLを開く
+    * `$`の右側に「コマンド」を打って操作
+* ログインするためのコマンド:
+```
+$ ssh <ユーザ名>@<IPアドレス>
+```
+    * 具体例: `ssh ubuntu@192.168.137.3`
+    * 意味
+        * `ssh`: 暗号化して他の計算機（ホスト）と通信するためのコマンド
+        * `ubuntu`: ログインするときの「ユーザ名」
+            * ログインする前のPC側でのユーザ名を探してみましょう
+        * IPアドレス: 接続先の住所
 
----
-
-## エディタ
-
-* （CLI, command line interface）でテキストファイルを読み書きするもの
-  * EmacsとVimがメジャー
-    * 特にここでは説明しません
-  * 練習コマンドがあるのでそれで練習を
-    * Vimにはvimtutorというコマンドがあり、最初はこれをやるのが一番良い
 
 ---
 
-## コマンド
+## 最初にやること
 
-* CLIからプログラムを起動する場合は字をシェルに打ち込むが、その字のこと
-  * プログラム自身のことも指し、このスライドではプログラム自身のこと
-* だいたいこの二種類
-  * システム操作のためのコマンド
-    * サービスを立ち上げたり止めたり
-    * これはマニュアルを見たら覚えられる
-  * フィルタコマンド
-    * 標準入力から文字を受けて標準出力に加工した字を出すもの
-    * 組み合わせて使う（マニュアルがあまりない）
+* ファイルの確認
+  * 設定ファイル置き場である/etc下のファイルを見てみましょう
+    * `ls /etc/`, `cat /etc/passwd`, `tree /etc/`などを使用
+* プロセスの確認
+  * `ps`, `top`, `pstree`などを使用
+
+```
+ubuntu@ubuntu:~$ pstree
+systemd─┬─ModemManager───2*[{ModemManager}]
+        ├─accounts-daemon───2*[{accounts-daemon}]
+        ├─2*[agetty]
+（中略）
+        ├─systemd-timesyn───{systemd-timesyn}
+        ├─systemd-udevd
+        ├─unattended-upgr───{unattended-upgr}
+        └─wpa_supplicant
+```
 
 ---
 
-## フィルタコマンド
+## <span style="text-transform:none">Linuxの</span>世界
 
-* 多数: grep, find, wc, ...
-  * /bin/下に存在
-* とりあえず最初に覚えるもの
-  * cat: 表示
-  * sudo: root権限でコマンドを実行
-    ```bash
-    $ sudo cat /etc/shadow
+* 「Linux（やUnix系OS）の世界」はとても単純
+    * 2大重要事項
+        * データは全て「<span style="color:red">ファイル</span>」（テキストファイル）で保存される
+        * プログラムは「<span style="color:red">プロセス</span>」単位で動く
+    * その他重要なこと
+        * ファイルもプロセスも<span style="color:red">木構造</span>で管理されている
+        * プロセスは<span style="color:red">コマンド</span>を手で打ったり設定ファイルに書いたりして起動
+
+この基本構造でなぜかロボットが動く
+
+---
+
+## なぜか<span style="text-transform:none">Linux</span>でロボットが動く
+
+* 一番良い例が一番身近にある
+    * ロボットの行き先の決定、画像処理、モータへの指令、通信
+    * ソフトウェア開発もLinuxで（GPUを使った深層学習など）
+* 単純な仕組みで様々な機能を実現。守備範囲が広い。
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q1FH93icuHk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+## <span style="text-transform:none">Linux</span>でロボットの機能を自由自在に作るには
+
+* 二大重要事項
+    * 構造を理解する
+    * 操作に慣れる（自転車と一緒）<br >　
+* 習得の際に気をつけること
+    * <span style="color:red">できることが増えないと面白さが分からない</span>
+       * ほとんどの人にとっては、最初ははっきり言ってつまらない。
+       * 教員を含めて楽しそうにしている連中に殺意しかわかない。
+       * 教員が楽しさを演出しても裏目に出るだけ。
+
+以後の時間は、みなさんを監禁して練習します。（面白くないので）
+
+---
+
+## ファイルの編集
+
+ロボットを動かしたいときに最初にやること
+
+* 「エディタ」を使う
+    * ここではCLI（command line interface）でテキストファイルを読み書きするものを指す
+        * EmacsとVimがメジャー
+        * 特にここでは説明しません
+    * 設定ファイルやプログラム、文章までなんでもこれで書く
+    * 練習コマンドがあるのでそれで練習を
+        * Vimにはvimtutorというコマンドがあり、最初はこれをやるのが一番良い
+
+---
+
+## ファイルの操作
+
+* 生成、移動、削除、プログラムの実行・・・
+    * /bin/などの下に存在するプログラム（ファイル）
+    * コマンドを使う
+        * ls, rm, cd, mkdir, rmdir, grep, find, wc, ...<br />　
+* 例題
+    * `aaa`というファイルと`bbb`を作り、`bbb`に`aaa`を入れる。その後、`aaa`を削除して`bbb`を削除。
+
+---
+
+## コマンドの練習
+
+* cat: 表示
+* sudo: root権限でコマンドを実行
+  ```bash
+  $ sudo cat /etc/shadow
+  ```
+* grep: 検索
+  ```bash
+  $ grep ueda /etc/passwd
+  ueda:x:1000:1000:Ryuichi UEDA,,,:/home/ueda:/bin/bash
+  ```
+* find: ファイルの列挙
+  ```bash
+  $ find /
     ```
-  * grep: 検索
-    ```bash
-    $ grep ueda /etc/passwd
-    ueda:x:1000:1000:Ryuichi UEDA,,,:/home/ueda:/bin/bash
-    ```
-  * find: ファイルの列挙
-    ```bash
-    $ find /
-    ```
-* **ところで、出力がザーッと出て使いにくくないか？**
+
+catやfindの結果をgrepしたり、findの結果を止めて眺めたりということがしたくなる
 
 ---
 
@@ -285,31 +350,6 @@
   $ chmod +x hoge.py
   $ ./hoge.py
   ```
-
----
-
-## <span style="text-transform:none">Raspbianのメンテナンス
-
-* rpi-update: カーネル等のアップデート
-```
-pi@raspberrypi:~ $ sudo rpi-update
-```
-* apt update: パッケージリストの更新
-```
-pi@raspberrypi:~ $ sudo apt update
-```
-* apt upgrade: パッケージのアップグレード
-```
-pi@raspberrypi:~ $ sudo apt upgrade
-```
-* raspi-config: Raspberry Piの機能設定
-```
-pi@raspberrypi:~ $ sudo raspi-config
-```
-  * ロケールの設定
-  * 言語環境の設定
-  * 起動時にGUIの抑制
-  * ssh, SPI等の機能をON/OFF
 
 ---
 
