@@ -325,3 +325,76 @@ data: 14
 ・・・
 ```
 
+---
+
+## ローンチファイル（準備）
+
+* ROS2ではPythonで記述
+* 準備
+    * ディレクトリを作成
+```
+$ cd ~/ros2_ws/src/mypkg/
+$ mkdir launch
+```
+    * `setup.py`にローンチファイルの場所を記述
+```
+  2 import os
+  3 from glob import glob
+（中略）
+ 11     data_files=[
+（中略）
+ 15        (os.path.join('share', package_name), glob('launch/*.launch.py'))
+ 16     ],
+```
+    * `package.xml`に依存関係を記述
+```
+・・・
+ 12   <exec_depend>launch_ros</exec_depend>
+・・・
+```
+
+---
+
+## ローンチファイル（記述）
+
+* コードを書く
+    * 名前は`talk_listen.listen.py`などとつけて、さきほど作った`launch`ディレクトリに置き、実行権限を与える
+```
+  1 import launch
+  2 import launch.actions
+  3 import launch.substitutions
+  4 import launch_ros.actions
+  5
+  6
+  7 def generate_launch_description():
+  8
+  9     talker = launch_ros.actions.Node(
+ 10         package='mypkg',
+ 11         node_executable='talker',
+ 12         )
+ 13     listener = launch_ros.actions.Node(
+ 14         package='mypkg',
+ 15         node_executable='listener',
+ 16         output='screen'
+ 17         )
+ 18
+ 19     return launch.LaunchDescription([talker, listener])
+```
+
+---
+
+## ローンチファイル（実行）
+
+* `colcon build`して実行
+    * バグ: 出力がバッファリングされて一定量溜まらないと表示されない（調査中）
+
+```
+$ ros2 launch mypkg talk_listen.launch.py
+[INFO] [launch]: All log files can be found below /home/ubuntu/.ros/log/2020-04-22-08-45-13-332489-ubuntu-17148
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [talker-1]: process started with pid [17158]
+[INFO] [listener-2]: process started with pid [17159]
+（かなり遅れてlistener.pyの出力がまとめて表示される）
+（Ctrl+Cで修了）
+```
+
