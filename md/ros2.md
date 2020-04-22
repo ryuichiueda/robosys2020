@@ -40,13 +40,29 @@ $ ./setup.bash
 $ source ~/.bashrc
 ```
 
-
 ---
 
 ## 動作確認
 
+roscoreは不要
 
+* パブリッシャを持つサンプルノードの起動
 ```bash
 端末1$ ros2 run demo_nodes_py talker
+・・・
+[INFO] [talker]: Publishing: "Hello World: 61"
+[INFO] [talker]: Publishing: "Hello World: 62"
+・・・
+```
+* リスナーを持つサンプルノードの起動
+```bash
+端末2$ ros2 run demo_nodes_py listener
+・・・
+[INFO] [listener]: I heard: [Hello World: 55]
+[INFO] [listener]: I heard: [Hello World: 56]
+・・・
 ```
 
+---
+
+## パブリッシャーを書く
