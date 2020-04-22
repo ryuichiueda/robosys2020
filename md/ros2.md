@@ -198,3 +198,130 @@ mypkg
 
 ## パブリッシャの作成
 
+* ミニマムなものを書いてみる
+    * スクリプトの置き場は`~/ros2_ws/src/mypkg/mypkg`
+    * 参考にしたページ
+        * [パブリッシャの書き方](https://index.ros.org/doc/ros2/Tutorials/Writing-A-Simple-Py-Publisher-And-Subscriber/#write-the-publisher-node)
+        * [クラスなしで記述する方法](https://qiita.com/l1sum/items/b7393c34fb0127826f74)
+* コードの前半（`talker.py`）
+
+```python
+  1 import rclpy
+  2 from rclpy.node import Node
+  3 from std_msgs.msg import Int16
+  4
+  5 rclpy.init()
+  6 node = Node("talker")                               #ノード作成
+  7 pub = node.create_publisher(Int16, "countup", 10)   #パブリッシャ作成
+  8 n = 0 #カウント用変数
+  9
+```
+（下に続く）
+
+>>>
+
+* コードの後半
+
+```python
+ 10 def cb():                  #定期的に呼ぶコールバック関数
+ 11     global n
+ 12     msg = Int16()
+ 13     msg.data = n
+ 14     pub.publish(msg)
+ 15     n += 1
+ 16
+ 17 node.create_timer(0.5, cb)  #タイマー設定
+ 18 rclpy.spin(node)            #実行（無限ループ）
+```
+
+---
+
+## パッケージの設定と実行
+
+* パッケージに`talker.py`や依存するモジュールを登録
+    * `package.xml`に利用するモジュールを登録
+```
+・・・
+  <license>BSD</license>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+・・・
+```
+    * `setup.py`にスクリプト（正確にはエントリポイント）を登録
+```python
+・・・
+        entry_points={
+        'console_scripts': [
+            'talker = mypkg.talker:main',
+        ],
+・・・
+```
+
+* 実行（下のスライド）
+
+>>>
+
+```
+$ chmod +x talker.py
+### 依存関係の確認 ###
+$ cd ~/ros2_ws
+$ sudo rosdep install -i --from-path src --rosdistro dashing -y
+### ビルド ###
+$ colcon build --packages-select mypkg
+Starting >>> mypkg
+Finished <<< mypkg [2.55s]
+
+Summary: 1 package finished [3.06s]
+### インストール ###
+$ . install/setup.bash
+### 実行 ###
+$ ros2 run mypkg talker
+（なにも表示されない）
+```
+
+```
+### 別の端末でサブスクライブする ###
+$ ros2 topic echo /countup
+data: 13
+---
+data: 14
+---
+・・・
+```
+
+---
+
+## サブスクライバの記述
+
+* これはクラスを使って作ってみましょう（`listener.py`）
+```python
+  1 import rclpy
+  2 from rclpy.node import Node
+  3 from std_msgs.msg import Int16
+  4
+  5 class ListenerNode(Node): #Nodeクラスの継承
+  6
+  7     def __init__(self): #初期化
+  8         super().__init__("Listener")
+  9         self.create_subscription(Int16, "countup", self.cb, 10)
+ 10
+ 11     def cb(self, msg):
+ 12         self.get_logger().info("Listen: %d" % msg.data)
+ 13
+ 14 rclpy.init()
+ 15 rclpy.spin( ListenerNode() ) #ノードをspinにしかける
+```
+
+---
+
+## <span style="text-transform:none">talker</span>と<span style="text-transform:none">listener</span>の実行
+
+```
+### ビルドの手続きを済ませておく ###
+端末1$ ros2 run mypkg talker
+端末2$ ros2 run mypkg listener
+[INFO] [Listener]: Listen: 142
+[INFO] [Listener]: Listen: 143
+・・・
+```
+
