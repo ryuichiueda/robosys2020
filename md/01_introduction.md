@@ -29,7 +29,7 @@
 ## ロボットシステム開発の変化
 
 * ハードやソフトの多くが部品化
-    * 作るより「つなぐ』機会が相対的に増える<br />$ $
+    * 作るより「つなぐ」機会が相対的に増える<br />$ $
 * インターネット上に知識が集積
     * 大学の先生から何を学ぶの？<br />$ $
 * 使える道具が増加$\rightarrow$開発の急速化
@@ -59,7 +59,7 @@
 
 * 例3: 設計製作論3
     * https://twitter.com/robo_cit/status/1201399538541400064?ref_src=twsrc%5Etfw
-        * サンプルコードをうまく使ってロボットに仕事をさせる
+        * サンプルコードをうまく改造してロボットに仕事をさせる
 
 ---
 
@@ -105,78 +105,18 @@
 
 ---
 
-## <span style="text-transform:none">Raspberry Pi</span>の入出力
-
-* 右図: Raspberry Pi 4
-    * 電源入力: USB Type-C
-    * ディスプレイへ出力: マイクロHDMI x2
-    * ストレージ: microSDカード
-    * 有線LANポート
-    * USBポート x4
-    * 40ピンのブロック
-        * 「GPIOピン」と呼ばれる
-    * 他: 専用カメラの取り付け端子等
-
-<img width="35%" src="md/images/raspi4.jpeg" />
-
----
-
-## GPIOピンの構成
-
-* Raspberry Pi 2からPi 4まで変わってない<br />$ $
-* 配置（Model Bのもの）: http://pinout.xyz
-    * 電源: 3.3V、5V
-    * GND
-    * GPIOピン: 27
-        * うち何本かがI2C、SPI、UARTも使える
-    * I2C ID EEPROM用ピン<br />$ $
-* A/D変換機能は付いていない
-
-
----
-
-## CPU・メモリ・ストレージ
-
-* Raspberry Pi 4の場合
-    * CPU: 1.5GHz Cortex-A72 ARMv8 64bit（4コア）
-    * DRAM: 1GB, 2GB, 4GBのいずれか。LPDDR4 SDRAM
-    * ストレージ: microSD
-         * 細かい規格のちがいに注意
-
-
----
-
 ## 講義の目的
 
 * 一つのシングルボードコンピュータを深く理解
-    * 低レイヤーから高レイヤー、さらにその外側まで一通り経験
-        * 低レイヤー: デバイスドライバ〜OS
-        * 高レイヤー: OS〜インターネットとのやりとり
-        * さらには著作権やライセンス、開発方法まで
-
----
-
-## 講義の内容
-
-全13回
-
-* 第1週: イントロダクション（今回）
-* 第2週: コンピュータボードの通信と操作
-    * ラズパイのセットアップと操作
-* 第3週: PC・オペレーティングシステム（OS）
-* 第4週: OSのプロセス
-* 第5週: ファイルシステム
-
----
-
-* 第6週: デバイスドライバの仕組み
-* 第7週: デバイスドライバの実装1
-* 第8週: デバイスドライバの実装2
-* 第9週: ソフトウェアライセンスとクリエイティブコモンズ
-* 第10週: GitとGitHub
-* 第11週: ROS1
-* 第12週: ROS2
-* 第13週: まとめ
+    * $\Longrightarrow$低レイヤーから高レイヤー、さらにその外側まで順番に一通り経験することで、各レイヤーの技術をつなげて考えられるようにする。<br >　
+* 低レイヤー
+    * OSの仕組み
+    * デバイスドライバ作成
+* 高レイヤー
+    * ROSのモジュール作成
+* 高高レイヤー
+    * 開発方法（Git、GitHub）
+    * 著作権やライセンス
 
 ---
 
@@ -204,87 +144,12 @@
 * LANケーブル
     * ノートPCとRaspberry Piを接続
 
-
 ---
 
 ## ウェブサイト等
 
 * [講義のサイト](https://lab.ueda.tech/?page=robosys_2020)<br />$ $
-* 連絡: 他人に見られてもいい内容はTwitterで[@ryuichiueda](https://twitter.com/ryuichiueda)
+* 連絡: 他人に見られてもいい内容はTwitterで[@ryuichiueda](https://twitter.com/ryuichiueda)あるいは[@uedalaboratory](https://twitter.com/uedalaboratory)
     * 質問も重要なコントリビューション<br />$ $
-* 課題提出
-    * コードをGitHubに
-    * デモビデオをYouTubeかどこかに
+* [この講義資料](https://github.com/ryuichiueda/robosys2020)にプルリクくれて私がマージしたら加点します。
 
----
-
-## テスト・レポート等
-
-* 課題は2回
-    * 配点: 各20点（＋α）
-* テストは1回
-    * 配点: 60点
-* 出席
-    * 遅刻、早退は0.5回とカウント
-
-* この講義資料にプルリクくれて私がマージしたら加点します。
-
-
----
-
-## 参考図書
-
-* 初心者の人はこれを購入のこと
-    * 福田 :[これ１冊でできる！ラズベリー・パイ　超入門 改訂第6版](https://www.amazon.co.jp/dp/4800712610)、ソーテック社, 2020.<br />$ $
-* Linuxの操作
-    * 初心者向け
-        * [Piro（結城洋志）: シス管系女子, 日経BP, 2015.](https://www.amazon.co.jp/dp/4822224961)
-    * 中級者〜
-        * 上田: [シェルプログラミング実用テクニック](https://www.amazon.co.jp/dp/4774173444), 技術評論社, 2015.
-
----
-
-* デバドラ関係
-    * Corbet 他(著), 山崎 他(翻訳): [Linuxデバイスドライバ 第3版](https://www.amazon.co.jp/dp/4873112532), オライリージャパン, 2005.
-        * デバイスドライバのリファレンス
-        * ちょっと古い
-        * [英語ならネット上に](http://www.makelinux.net/ldd3/)<br />$ $
-    * 米田: [Raspberry Piで学ぶ ARMデバイスドライバープログラミング](https://www.socym.co.jp/book/940), ソシム, 2014.
-
----
-
-* OS
-    * Tanenbaum: [オペレーティングシステム 第3版](https://www.amazon.co.jp/dp/4894717697), ピアソンエデュケーション, 2007.
-        * 中古が出回っている
-    * Bovet: [詳解 Linuxカーネル 第3版](https://www.amazon.co.jp/dp/487311313X), オライリー・ジャパン, 2007.
-    * 竹内: [試して理解 Linuxのしくみ ~実験と図解で学ぶOSとハードウェアの基礎知識](https://www.amazon.co.jp/dp/477419607X)
-
----
-
-## 宿題: <span style="text-transform:none">Raspberry Pi</span><br />のセットアップ
-
-* Raspberry Piを入手して<span style="color:red">Ubuntu</span>をインストールのこと
-    * 昨年までは、最初はRaspbianでしたが最初からUbuntuで
-	* MicroSDカードは16GBで十分（たぶん32GBまでは問題ないけどそれ以上だと難しい）
-	* 方法
-	    * [Twitterに書きました](https://twitter.com/ryuichiueda/status/1250644188992962560)
-	    * ソフトウェアをダウンロードするサイト
-	        * [Install Ubuntu Server on a Raspberry Pi 2, 3 or 4](https://ubuntu.com/download/raspberry-pi)
-	        * [Etcher](https://www.balena.io/etcher/)
-    * 諸注意
-        * デスクトップ環境は使いません
-        * ギブアップしてもケアしますから脱落の必要はナシ
-
----
-
-## 次回
-
-* 教室でRaspberry Piを使います
-    * ノートPCにLANケーブルで接続してSSHから操作
-
----
-
-## 作業
-
-* Windowsの人はWSLをインストールしましょう
-    * [手順](https://ryuichiueda.github.io/ShellGeiData/WSL20200328.html)
