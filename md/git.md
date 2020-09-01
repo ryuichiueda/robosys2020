@@ -25,7 +25,7 @@
 
 ---
 
-## Git
+## <span style="text-transform:none">Git</span>
 
 * 版管理（バージョン管理）システム
   * ファイルの変更履歴を管理するためのシステム
