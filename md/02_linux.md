@@ -8,30 +8,7 @@
 
 ## 今日の内容
 
-* ノートPCとラズパイを接続
-
----
-
-## やること
-
-* 下の写真のようにノートPCとラズパイを有線LANで直接接続
-* 次のような接続を構成
-  * ラズパイ -> 有線LAN -> ノートPC -> ノートPCのWiFi -> インターネット
-  * つまりノートPCをルータにする
- 
-<img width="35%" src="./md/images/raspi4_connect.jpeg" />
-
----
-
-## ノートPCのOS別設定方法
-
-* [Windows](https://twitter.com/ryuichiueda/status/1250644188992962560)
-* [Mac](https://b.ueda.tech/?post=08717)
-  * 拙ブログですみません
-* ラズパイのIPの調べ方
-  * `$ nmap -sP <有線側のセグメント>`
-  * `$ arp -a
-* Linux: DHCPを立てるのが面倒なので割愛
+* Raspberry Pi、Linuxの操作
 
 ---
 
@@ -91,12 +68,14 @@ systemd─┬─ModemManager───2*[{ModemManager}]
 
 ## なぜか<span style="text-transform:none">Linux</span>でロボットが動く
 
-* 一番良い例が一番身近にある
+* 一番良い例が一番身近にある（CIT Brains）
     * ロボットの行き先の決定、画像処理、モータへの指令、通信
     * ソフトウェア開発もLinuxで（GPUを使った深層学習など）
 * 単純な仕組みで様々な機能を実現。守備範囲が広い。
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/q1FH93icuHk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[https://youtu.be/q1FH93icuHk](https://youtu.be/q1FH93icuHk)
 
 ---
 
@@ -108,10 +87,8 @@ systemd─┬─ModemManager───2*[{ModemManager}]
 * 習得の際に気をつけること
     * <span style="color:red">できることが増えないと面白さが分からない</span>
        * ほとんどの人にとっては、最初ははっきり言ってつまらない。
-       * 教員を含めて楽しそうにしている連中に殺意しかわかない。
-       * 教員が楽しさを演出しても裏目に出るだけ。
-
-以後の時間は、みなさんを監禁して練習します。（面白くないので）
+       * 遊ぶように学習できるきっかけ（例えばシェル芸が楽しいと思える）があれば大変良いが、そうでない場合はしばらく無心で練習
+       * シェル芸については各自調べてください
 
 ---
 
@@ -271,9 +248,6 @@ $ ping www.yahoo.co.jp
   $ rsync -av hoge/ 192.168.3.1:~/hoge/ #hogeディレクトリを192..1のホームへ
   $ rsync -av192.168.3.1:~/hoge/ hoge/   #逆向き
   ```
-* TeraTermにもscp機能がある
-
-
 
 ---
 
@@ -347,19 +321,11 @@ $ ping www.yahoo.co.jp
 ## 次回までの宿題
 
 * エディタが苦手な人はvimtutorをやっておく
-  `$ vimtutor`
-* 得意な人はVimやEmacsにプラグインを仕込む
-  * Vimの場合はdein等
-    * https://github.com/Shougo/dein.vim
-
----
-
-## 補足
-
-* SSH接続でこういうのが出た時の対処
-  ```bash
-  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @
-  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  ```
-  * → `~/.ssh/known_hosts` から接続先のIPアドレスを見つけてレコードを削除
+```
+  $ vimtutor
+```
+* 得意な人は
+  * VimやEmacsにプラグインを仕込む
+    * Vimの場合はdein等
+      * https://github.com/Shougo/dein.vim
+    * VimなどでCのプログラムなどを書いてコンパイル
