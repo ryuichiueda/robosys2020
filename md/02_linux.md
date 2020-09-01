@@ -12,7 +12,7 @@
 
 ---
 
-## ログインしてみましょう
+## 準備: ログインしましょう
 
 * MacやLinuxならTerminal、WindowsならWSLを開く
     * `$`の右側に「コマンド」を打って操作
@@ -30,25 +30,76 @@ $ ssh <ユーザ名>@<IPアドレス>
 
 ---
 
-## 最初にやること
+## <span style="text-transform:none">Raspberry Pi</span>の入出力
 
-* ファイルの確認
-  * 設定ファイル置き場である/etc下のファイルを見てみましょう
-    * `ls /etc/`, `cat /etc/passwd`, `tree /etc/`などを使用
+* 右図: Raspberry Pi 4
+    * 電源入力: USB Type-C
+    * ディスプレイへ出力: マイクロHDMI x2
+    * ストレージ: microSDカード
+    * 有線LANポート
+    * USBポート x4
+    * 40ピンのブロック
+        * 「GPIOピン」と呼ばれる
+    * 他: 専用カメラの取り付け端子等
+
+<img width="35%" src="md/images/raspi4.jpeg" />
+
+---
+
+## GPIOピンの構成
+
+* Raspberry Pi 2からPi 4まで<br />変わってない
+* 配置（Model Bのもの）: 右図
+    * 電源: 3.3V、5V
+    * GND
+    * GPIOピン: 27
+        * うち何本かでI2C、<br />SPI、UARTも使える
+    * I2C
+    * その他
+* A/D変換機能ナシ
+
+<img width="40%" src="md/images/pin.jpg" />
+
+<span style="font-size:50%">図：「上田隆一: Raspberry Piで学ぶ ROSロボット入門, 日経BP, 2017.」から</span>
+
+---
+
+## CPU・メモリ・ストレージ
+
+* Raspberry Pi 4の場合
+    * CPU: 1.5GHz Cortex-A72 ARMv8 64bit（4コア）
+    * DRAM: 1GB, 2GB, 4GBのいずれか。LPDDR4 SDRAM
+    * ストレージ: microSD
+         * 細かい規格のちがいに注意<br />　
+* 「コマンド」で調査可能
+    * `cat /proc/cpuinfo`、`free`、`lshw`、`ls /dev/mmcblk*`
+
+---
+
+## システムの調査
+
+* いま操作しているものは何なのかを調べる
+    * *コマンド*を使って
+        * `uname`、`cat /etc/lsb-release`<br />　
+* Linux: オペレーティングシステム（OS）
+    * 今はこの言葉だけ覚えましょう
+* Ubuntu: Linuxのディストリビューション
+    * こちらも今はこの言葉だけ覚えましょう
+
+---
+
+## 環境の調査
+
+* ファイルとディレクトリの確認
+    * ファイル: データを保存したもの
+    * ディレクトリ: ファイルやディレクトリの置き場所
+    * `pwd`で確認、`cd`で移動
+        * ホームディレクトリ、ルートディレクトリ<br />　
 * プロセスの確認
-  * `ps`, `top`, `pstree`などを使用
+    * プロセス: 動いているプログラムの単位
+    * `ps`、`top`、`pstree`
 
-```
-ubuntu@ubuntu:~$ pstree
-systemd─┬─ModemManager───2*[{ModemManager}]
-        ├─accounts-daemon───2*[{accounts-daemon}]
-        ├─2*[agetty]
-（中略）
-        ├─systemd-timesyn───{systemd-timesyn}
-        ├─systemd-udevd
-        ├─unattended-upgr───{unattended-upgr}
-        └─wpa_supplicant
-```
+以上で調査終了
 
 ---
 
@@ -62,7 +113,7 @@ systemd─┬─ModemManager───2*[{ModemManager}]
         * ファイルもプロセスも<span style="color:red">木構造</span>で管理されている
         * プロセスは<span style="color:red">コマンド</span>を手で打ったり設定ファイルに書いたりして起動
 
-この基本構造でなぜかロボットが動く
+この基本構造でなぜかロボットが動く<br />（入出力はどうするんだ？という話は第3回以降）
 
 ---
 
@@ -88,7 +139,7 @@ systemd─┬─ModemManager───2*[{ModemManager}]
     * <span style="color:red">できることが増えないと面白さが分からない</span>
        * ほとんどの人にとっては、最初ははっきり言ってつまらない。
        * 遊ぶように学習できるきっかけ（例えばシェル芸が楽しいと思える）があれば大変良いが、そうでない場合はしばらく無心で練習
-       * シェル芸については各自調べてください
+           * シェル芸については各自調べてください
 
 ---
 
@@ -103,7 +154,7 @@ systemd─┬─ModemManager───2*[{ModemManager}]
 
 ---
 
-## コマンドの練習
+## ファイルやディレクトリの調査
 
 * cat: 表示
 * sudo: root権限でコマンドを実行
@@ -151,7 +202,7 @@ catやfindの結果をgrepしたり、findの結果を止めて眺めたりと�
 
 ---
 
-## 正規表現の例
+## 正規表現
 
 *  /etc/servicesの調査
   ```bash
@@ -160,12 +211,12 @@ catやfindの結果をgrepしたり、findの結果を止めて眺めたりと�
   $ cat /etc/services | grep ftp                #ftpという語句を検索
   $ cat /etc/services | grep ^ftp       #最初がftpで始まる行を検索
   ```
-* 上級者向け
-  * AWKとgrepで10000番ポート以上のレコードを抽出のこと
+* 上級者向け問題
+  * AWKとgrepで10000番ポート以上のレコードを抽出してください
 
 ---
 
-## <span style="text-transform:none">man</span>
+## マニュアル
 
 * マニュアルコマンド
   ```bash
