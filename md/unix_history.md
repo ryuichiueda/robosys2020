@@ -65,25 +65,29 @@
 * ゴミ捨て場 `/dev/null`
 * ひたすら0x00を吐く `/dev/zero`
 
-
 ---
 
 ## プロセス
 
-* OSなしのマイコン制御: 一度に一つのプログラムだけ実行
-* OSがある: 複数実行可能
+* OSがある=複数実行可能
+    * OSなしのマイコン制御: 一度に一つのプログラムだけ実行
     * 恩恵もあるが複雑になる
-    * ここでは簡単な説明に止めて、歴史から仕組みを考える
-        * なぜOSというものがあるのか
-        * なぜこんな仕組みなのか？
-        * ロボットとの親和性は？<br />$ $
-* 話の流れ
-  * UNIX 以前$\rightarrow$UNIX$\rightarrow$UNIXの派生物$\rightarrow$Linux
-
+        * 複数のプロセスがファイルやメモリ、機器を同時に使いに来るので交通整理が必要
 
 ---
 
-## UNIX以前
+## ここまでのまとめ
+
+* OSというものは、なんでもファイルとして扱い、<br />プロセスを同時に走らせるためのものらしい
+    * 正直よくわからん<br />　
+* ついでに言うと、前回のGitHubもよく分からん
+    * なぜソフトウェアを公開するのか？<br />　
+
+なぜそういうもの/ことになった理由を<br />歴史をさかのぼって考えてみましょう
+
+---
+
+## <span style="text-transform:none">Unix以前</span>
 
 * 初期の計算機の使われ方（-1965 年）
   * 主に科学計算や集計
@@ -104,7 +108,7 @@
     * オペレータはもらった順に手でプログラムを計算機にセット
     * オペレータは計算結果をプログラマに渡す
 
-要は流れ作業。<br ><span style="font-size:70%">当然ながらロボットには組み込めない。</span>
+要は流れ作業<br ><span style="font-size:70%">当然ながらロボットには組み込めない</span>
 
 ---
 
@@ -121,28 +125,41 @@
 
 ---
 
-## マルチプログラミング
+## マルチタスク
 
 * 1964年ごろ実用
-  * [このころの計算機（IBM System/360）](https://en.wikipedia.org/wiki/File:DM_IBM_S360.jpg)（CC BY 2.5）<br />$ $
-* どんなものか
-  * メモリをパーティション分けして複数のジョブを置き、実行
-      * <span style="color:red">今はOSがやっている</span>
-  * メモリをジョブがお互いに覗かないようにする（ハードで）
-      * <span style="color:red">これも現在のOSの仕事</span><br />$ $
-* 課題
-  * メモリの量が動的に変わらない
+  * [このころの計算機（IBM System/360）](https://en.wikipedia.org/wiki/File:DM_IBM_S360.jpg)（CC BY 2.5）
+      * System/360: 商用で初めてOSを搭載。補助記憶装置も搭載。<br />$ $
+* 最初のころのマルチタスク
+  * メモリをパーティション分け（固定）して複数のジョブを置き、実行
+      * <span style="color:red">今はメモリやCPUの割当をOSがやっている</span>
+  * メモリをジョブがお互いに覗かないようにする
+      * ハードで実現する方法もあったらしいが、これも現在はOSの仕事<br />$ $
+* その後、メモリのパーティションが動的に
 
+
+---
+
+## この頃の記憶装置の使い方
+
+* パンチカードの延長
+    * マイコンでのメモリの使い方に近いかもしれない
+        * 特定の用途のものをテープの範囲を決めて書き込む
+    * データの中身のフォーマットまでOSが関与
+        * 現在のRDBに近い
+        * メインフレーム<br />　
+* 階層の表現
+    * ファイル名を.をつけて区切るなど<br />　
 
 ---
 
 ## タイムシェアリングへ
 
 * 1960年代<br />$ $
-* マルチプログラミングをさらに発展
-  * プログラムを持ち込むバッチ処理から端末による対話式へ
-      * プロセス中心に話をしているが、計算機内でのデータの置き方も重要に
-  * <span style="color:red">オペレータの仕事の一部がOSの機能に置き換わった</span><br />$ $
+* マルチタスクをさらに発展
+    * 時間で区切って複数のジョブでCPUを使い回す
+    * プログラム持ち込みのバッチ処理から端末による対話式へ
+        * <span style="color:red">オペレータの仕事がOSの機能に置き換わった</span><br />$ $
 * 主なプロジェクト
   * CTSS（compatible time sharing system）
   * MULTICS（multipexed information and computing service）<br />$ $
@@ -151,7 +168,7 @@
 
 ---
 
-## <span style="text-transform:none">UNIX（Unix）
+## <span style="text-transform:none">Unix</span>
 
 * MULTICS プロジェクトに参加していたベル研のKen Thompsonらが[PDP-7](https://commons.wikimedia.org/wiki/File:Pdp7-oslo-2005.jpeg)（CC SA 1.0）上で開発
     * 1960 年代末<br />$ $
@@ -159,19 +176,19 @@
   * （単にゲームを動かしたかっただけという説も）<br />$ $
 * MULTI（多方向）→UNI（単方向）
   * MULTICSの開発: たくさんの研究組織、研究員
-  * UNIXの開発（注意: 私の独自解釈です）
+  * Unixの開発（注意: 私の独自解釈です）
     * ドキュメント管理したい（＋ゲームやりたい）という明確な目標
     * 3人+αで早く作りたい→シンプルに作りたい
 
 
 ---
 
-## UNIXが具現化/受け継いだ機能
+## <span style="text-transform:none">Unix</span>が具現化/受け継いだ機能
 
 
 * 階層型ファイルシステム
   * ファイル: データ（バイナリ）の塊に名前をつけて管理
-  * ディレクトリ: ファイルを整理するファイル
+      * ディレクトリをたどって読み出す（木構造）
   * デバイスファイル: 機器もファイル<br />$ $
 * プロセス・タイムシェアリング
   * 複数の処理を同時に走らせる
@@ -197,33 +214,42 @@
 
 ---
 
-## OSの機能以外に重要なこと
+## <span style="text-transform:none">Unix</span>の機能以外に重要なこと
 
 * オープンソースの走り
   * 当時AT&T はコンピュータで商売できない（独禁法）
-  * そこでコードを配布
-  * 結果、企業、研究機関、教育機関に広まる<br />$ $
+  * そこでコードを配布<br />$ $
+* $\Longrightarrow$企業、研究機関、教育機関に広まる
+    * バグのレポートや修正
+    * 使えるソフトの増加
+
+現在GitHubで行われていること
+
+---
+
+## <span style="text-transform:none">Unix</span>以後
+
 * 1984年AT&T商売解禁
   * ライセンス業を始め、クローズ化
-  * 「[UNIX 戦争](http://www.unix.org/what_is_unix/history_timeline.html)」が始まる
+  * 「[Unix 戦争](http://www.unix.org/what_is_unix/history_timeline.html)」が始まる
     * http://juangotoh.hatenablog.com/entry/2017/09/19/201202 <br />$ $
-* 余波: 配布されたUNIX から様々な亜種が誕生
-  * UNIX系OSと呼ばれるもの
+* 余波: 配布されたUnix から様々な亜種が誕生
+  * Unix系OSと呼ばれるもの
   * ソースコードの流用
-  * 機能の再現
+  * 機能の再現（クローン作り）
 
 
 ---
 
-## [UNIX系OSの系譜](https://en.wikipedia.org/wiki/File:Unix_history-simple.svg)<span style="font-size:50%">（CC BY-SA 3.0）</span>
+## [<span style="text-transform:none">Unix</span>系OSの系譜](https://en.wikipedia.org/wiki/File:Unix_history-simple.svg)<span style="font-size:50%">（CC BY-SA 3.0）</span>
 
-* UNIX直系: 大雑把に言ってSystem V系とBSD系
+* Unix直系: 大雑把に言ってSystem V系とBSD系
   * ものによって使用感が異なる<br />$ $
 * 我々がよく使うもの
   * 組み込みの世界だとBSD系が多い
     * FreeBSD, NetBSD, OpenBSD, OS X, iOS…<br />$ $
-* MINIX, Linux: UNIXのコードを含まないが動作はUNIX
-  * MINIX（1987年〜）: UNIX がクローズ化したためタネンバウムによって教育用に開発
+* MINIX, Linux: Unixのコードを含まないが動作はUnix
+  * MINIX（1987年〜）: Unix がクローズ化したためタネンバウムによって教育用に開発
   * Linux: 次のページ
 
 
