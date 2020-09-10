@@ -51,37 +51,113 @@
 
 ---
 
-## パーティションの確認
+## パーティションの確認1
+
+* microSDカードの使われ方を`parted`で観察
+    * ディスク: `/dev/mmcblk0`として認識されている
+        * ファイル？（後述）
 
 ```bash
 $ sudo parted -l
-Model: SD SA16G (sd/mmc)
-Disk /dev/mmcblk0: 15.6GB
-Sector size (logical/physical): 512B/512B
-Partition Table: msdos
-Disk Flags:
+モデル: SD SA16G (sd/mmc)
+ディスク /dev/mmcblk0: 15.6GB
+セクタサイズ (論理/物理): 512B/512B
+パーティションテーブル: msdos
+ディスクフラグ:
 
-Number  Start   End     Size    Type      File system  Flags
-1      4194kB  1089MB  1085MB  primary   fat32        lba
-2      1091MB  15.6GB  14.5GB  extended
-5      1095MB  1158MB  62.9MB  logical   fat16        lba
-6      1162MB  15.6GB  14.5GB  logical   ext4
-3      15.6GB  15.6GB  33.6MB  primary   ext4
+番号  開始    終了    サイズ  タイプ   ファイルシステム  フラグ
+ 1    1049kB  269MB   268MB   primary  fat32             boot, lba
+ 2    269MB   15.6GB  15.3GB  primary  ext4
 ```
 
 ---
 
-## <span style="text-transform:none">iノード、ディレクトリ
+## パーティションの確認2
+
+* 各パーティションのOSから見え方を`df`で調査
+    * `/dev/mmcblk0p1`、`/dev/mmcblk0p2`と名前がついている
+        * これもファイル？（後述）
+    * `/dev/mmcblk0p2`がメインのストレージ
+    * `/dev/mmcblk0p1`は`/boot/firmware`用
+
+```bash
+$ df -Th | grep -e Filesystem -e mmc
+Filesystem     Type      Size  Used Avail Use% Mounted on
+/dev/mmcblk0p2 ext4       14G  3.1G   11G  23% /
+/dev/mmcblk0p1 vfat      253M   97M  157M  39% /boot/firmware
+```
+
+---
+
+## <span style="text-transform:none">ext4</span>のブロック
+
+* ブロックのサイズが4096バイト 
+* ブロックグループには32768個のブロック
+
+```bash
+$ sudo dumpe2fs /dev/mmcblk0p2 | grep -i block | head
+dumpe2fs 1.45.5 (07-Jan-2020)
+Block count:              3731195
+Reserved block count:     155491
+Free blocks:              2955122
+First block:              0
+Block size:               4096
+Reserved GDT blocks:      354
+Blocks per group:         32768
+Inode blocks per group:   495
+Flex block group size:    16
+Reserved blocks uid:      0 (user root)
+```
+
+
+---
+
+## ブロックグループのレイアウト
+
+* 以下のブロックが順に並んでいる（実例は次ページ）
+    * ※スーパーブロック: パーティションの情報
+    * ※グループディスクリプタ: あとのブロックグループの情報
+    * （拡張用のブロック）
+    * データブロックビットマップ: ブロックの使用状況のフラグ
+    * <span style="color:red">iノード</span>ビットマップ: iノードの使用状況のフラグ
+    * iノードテーブル: iノードのリスト
+    * データブロック: ファイルの中身<br />　
+* <span style="font-size:70%">iノードについてはあとで</span>
+* <span style="font-size:70%">※: 最初のブロックグループにしかないが、バックアップのためにいくつかのブロックグループも持っている</span>
+
+---
+
+## 最初のブロックグループ
+
+```bash
+$ sudo dumpe2fs /dev/mmcblk0p2 | sed -n '/グループ 0/,/グループ 1/p' | sed '$d'
+dumpe2fs 1.45.5 (07-Jan-2020)
+グループ 0: (ブロック 0-32767) csum 0x5a66 [ITABLE_ZEROED]
+  Primary superblock at 0, Group descriptors at 1-2
+  Reserved GDT blocks at 3-356
+  Block bitmap at 357 (+357)
+  Inode bitmap at 373 (+373)
+  Inode table at 389-883 (+389)
+  117 free blocks, 1 free inodes, 754 directories
+  Free blocks: 24504, 24596-24601, 24684, 24759, 24838, 24980, （略）
+  Free inodes: 746
+```
+
+
+---
+
+## <span style="text-transform:none">iノード、ディレクトリ</span>
 
 * iノード: ファイルを管理するためのデータ
-  * iノード番号: ファイルやディレクトリ（これもファイル）の固有番号
-  * `$ ls -i` で、iノード番号が表示できる
-  * ディレクトリもファイルなので当然iノード番号を持つ<br />　
+  * ファイルの情報やデータブロックへのポインタを有する
+  * iノード番号: ファイルの固有番号
+     * `$ ls -i` で表示
+     * ディレクトリもファイルなのでiノード番号を持つ<br />　
 * ディレクトリ
-  * ディレクトリエントリのリストの管理
-  * ディレクトリエントリ
-  * ファイルのiノードと名前
-    * （ファイル名を変えても変わるのはファイル本体ではない）
+  * dエントリのリストが記録されたファイル
+  * dエントリ
+    * ファイル名と対応するiノード番号を結びつけたもの
+      * （ファイル名を変えても変わるのはファイル本体ではない）
 
 ---
 
