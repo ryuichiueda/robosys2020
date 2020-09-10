@@ -1,8 +1,8 @@
-# ロボットシステム学<del>第5回</del>第6回
+# ロボットシステム学第6回
 
 上田 隆一
 
-2019年10月25日@千葉工業大学
+千葉工業大学
 
 ---
 
@@ -32,7 +32,7 @@
 * 主なファイルシステム
   * ext4, ext3, (extended file system): Linux
   * UFS2 (UNIX File System2): FreeBSD
-  * HFS+ (Hierarchical File System Plus): Mac OS X, macOS
+  * APFS (Apple File System), HFS+: Mac OS X, macOS
   * NTFS (NT File System), FAT16, FAT32, exFAT: Windows
 * 特殊なファイルシステム
   * procfs, sysfs, tmpfs, スワップファイルシステム
@@ -173,11 +173,11 @@ file1
 
 ---
 
-## デバイスドライバ・デバイスファイル
+## デバイスドライバ・<br />デバイスファイル
 
 * デバイスドライバ
   * 計算機に接続された機器を操作するためのプログラム
-  * HDD、ディスプレイ、カメラ、マイク、端末、 ...
+  * HDD、ディスプレイ、カメラ、マイク、端末、 ...<br />　
 * デバイスファイル
   * デバイスドライバのインタフェース
   * ファイルとして表現されている
@@ -252,39 +252,4 @@ bluetooth             326067  22 bnep,btbcm,hci_uart
     ``` 
 * insmodすると/sys/下で情報が見られるようになるので興味のある人は調査を
   * あとでカーネルモジュールを書くときにやります
-
----
-
-## デバイスドライバを作る
-
-* 来週から2週にかけて取り組みます
-* 準備をしましょう（宿題）
-  * カーネルモジュールはカーネルの一部なので、今動いているカーネルと整合性がないと動かない
-    * 今動いているカーネルのバージョンにあったLinuxのヘッダファイルが必要
-  * Raspbianの場合
-    * 基本的に自分でLinuxのソースコードをダウンロードして、一度カーネルを作るのが面倒なようで手っ取り早い
-      * これで整合性のあるヘッダファイルが得られる
-      * やり方は次のページ
-
----
-
-## カーネルの再構築
-
-* LinuxをGitHubからクローンしてビルドしてカーネルを作ります
-* 難しいので作業をシェルスクリプトにしました: [kernel_build_and_install_for_pi2_pi3.bash](https://github.com/ryuichiueda/raspberry_pi_kernel_build_scripts/blob/master/kernel_build_and_install_for_pi2_pi3.bash)
-  * 手順
-
-       ```bash
-       $ git clone https://github.com/ryuichiueda/raspberry_pi_kernel_build_scripts.git
-       $ cd raspberry_pi_kernel_build_scripts
-       $ sudo ./kernel_build_and_install_for_pi2_pi3.bash
-       $ sudo reboot
-       ``` 
-     * カーネルの入れ替わりの確認
-       * `uname -a`でビルドされた日時を確認
-
-         ```bash
-         pi@raspberrypi:~ $ uname -a
-         Linux raspberrypi 4.4.22-v7+ #1 SMP Mon Sep 26 13:11:18 JST 2016 armv7l GNU/Linux
-         ```
 
