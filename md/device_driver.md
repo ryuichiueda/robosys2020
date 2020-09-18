@@ -27,6 +27,18 @@
 
 ---
 
+## これからやることについて補足
+
+* 「ただLEDを光らせるだけでこんなに苦労しなければならないのか」と質問があったので・・・<br />　
+* そんなことはない
+  * `/sys/class/gpio`の操作
+  * WiringPi
+  * ・・・<br />　
+* デバドラを書く意味
+  * 機械からユーザランドまでの仕組みの一部を理解
+
+---
+
 ## 最初のコード
 
 * ファイル名は「myled.c」にしましょう
@@ -508,7 +520,7 @@ $ cat dev
 
 ## <span style="text-transform:none">/dev下の確認
 
-* udevというサービスが`/sys/class/myled/myled0/dev`を見てデバイスファイルを作成
+* <span style="color:red">udev</span>というサービスが`/sys/class/myled/myled0/dev`を見てデバイスファイルを作成
 
 ```bash    
 $ ls -l /dev/myled0
@@ -522,10 +534,8 @@ ls: /dev/myled0 にアクセスできません: そのようなファイルや�
 
 ## デバイスファイルからの字の<br />読み込み
 
-* カーネルの外（ユーザランド）からの字の書き込みをカーネルに読み込む
-  * アドレス空間が違う（仮想アドレスからカーネルのアドレス空間へ）
+* カーネルの外（ユーザランド）からの字を取り込む
   * `copy_from_user`という関数を使用
-  * @@@@@@
 
 <span style="font-size:80%">
 
@@ -554,13 +564,14 @@ static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_
 
 ```bash
 $ echo abc > /dev/myled0 
-$ tail /var/log/messages
+$ tail /var/log/kern.log
 （中略）
-Oct 23 14:10:45 raspberrypi kernel: [ 1437.805316] /home/pi/robosys_device_drivers/myled.c is loaded. major:243
-Oct 23 14:11:10 raspberrypi kernel: [ 1462.960887] receive a
-Oct 23 14:11:10 raspberrypi kernel: [ 1462.960911] receive b
-Oct 23 14:11:10 raspberrypi kernel: [ 1462.960920] receive c
-Oct 23 14:11:10 raspberrypi kernel: [ 1462.960929] receive
+Sep 18 04:47:43 ubuntu kernel: [87575.075437] /home/ubuntu/myled/myled.c is loaded. major:507
+Sep 18 04:48:04 ubuntu kernel: [87596.096068] receive a
+Sep 18 04:48:04 ubuntu kernel: [87596.096085] receive b
+Sep 18 04:48:04 ubuntu kernel: [87596.096098] receive c
+Sep 18 04:48:04 ubuntu kernel: [87596.096111] receive
+Sep 18 04:48:04 ubuntu kernel: [87596.096111]
 ```
 
 ---
@@ -568,7 +579,9 @@ Oct 23 14:11:10 raspberrypi kernel: [ 1462.960929] receive
 ## デバイスファイルからの出力
 
 * catすると寿司を表示する無駄機能の実装
-  * `copy_to_user`でカーネルからユーザランドへ文字を送ります
+  * `copy_to_user`でカーネルからユーザランドへ文字を送信
+
+<span style="font-size:80%">
 
 ```c      
 static ssize_t sushi_read(struct file* filp, char* buf, size_t count, loff_t* pos)
@@ -590,6 +603,8 @@ static struct file_operations led_fops = {
 };
 ```
 
+</span>
+
 ---
 
 ## GPIOの操作
@@ -598,9 +613,9 @@ static struct file_operations led_fops = {
   * メモリマップドI/O
   * 番地をどう調べるか（なかなか難しい問題）
 * Raspberry Piの場合
-  * Raspberry Piのページのbcm2835に関するページで調査
+  * [Raspberry Piのページのbcm2835に関するページ](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/README.md)で調査
     * 「Peripheral specification」をクリック
-  * Raspberry Pi 3のbcm2837とはレジスタのアドレスの開始位置が違うので読み替え
+  * Raspberry Pi2以降のチップとはレジスタのアドレスの開始位置が違うので読み替え
 
 ---
 
@@ -612,6 +627,8 @@ static struct file_operations led_fops = {
     * bcm2835のpdfには書いてない
     * このアドレスの後のレジスタの配置は同じ（Peripheral specification90,91ページ）
   * 0xA0: 必要なアドレスの範囲（91ページを読んで設定）
+
+<span style="font-size:80%">
 
 ```c
 ...
@@ -627,6 +644,8 @@ static int __init init_mod(void)
 ...
 ```
 
+</span>
+
 ---
 
 ## GPIOピンを出力にする
@@ -636,6 +655,8 @@ static int __init init_mod(void)
 * Peripheral specificationのp. 90-92あたり
   * GPIO25の機能はGPFSEL2にある
   * GPFSEL2の17,16,15番目のビットを001に設定
+
+<span style="font-size:80%">
 
 ```c
 static int __init init_mod(void)
@@ -653,13 +674,17 @@ static int __init init_mod(void)
 ...
 ```
 
+</span>
+
 ---
 
 ## ON/OFFの書き込み
 
-p. 90, 95
-ON: 「GPFSET0」のGPIO25に対応するところに1を書き込む
-OFF: 「GPCLR0」のGPIO25に対応するところに1を書き込む
+* p. 90, 95
+  * ON: 「GPFSET0」のGPIO25に対応するところに1を書き込む
+  * OFF: 「GPCLR0」のGPIO25に対応するところに1を書き込む
+
+<span style="font-size:80%">
 
 ```c
 static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_t* pos)
@@ -677,17 +702,17 @@ static ssize_t led_write(struct file* filp, const char* buf, size_t count, loff_
 }
 ```
 
+これで完成
+
 ---
 
-## 補足
+## まとめ
 
-* 「ただLEDを光らせるだけでこんなに苦労しなければならないのか」と質問をいただいたので・・・
-* そんなことはない
-  * `/sys/class/gpio`の操作
-  * WiringPi
-* デバドラを書いた意味
-  * 機械からユーザランドまでの仕組みの一部を理解した
-  * デバイスドライバで利用できる他の機能の学習の機会を得た
-    * タイマー
-    * メモリをもっと使った処理を含むデバイスドライバ
-
+* デバイスドライバのコードを書いた
+  * 最低限のもの<br />　
+* VFSのread, writeを実装
+  * 疑似ファイルの入出力を実装<br />　
+* udev
+  * デバイスファイルを自動作成してくれた
+  * その他デバイスまわりの自動化をしてくれる
+    * 例）設定を書いておけば、ロボットのセンサの抜き差しの際にデバイスファイルのパーミッション設定をしてくれる
