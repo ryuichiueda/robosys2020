@@ -623,7 +623,8 @@ static struct file_operations led_fops = {
 
 * GPIOのレジスタを配列にマッピング
   * マッピング: アドレスとアドレスを対応付けること
-  * 0x3f200000: GPIOのレジスタの最初のアドレス
+  * 0x3f200000/0xfe200000: GPIOのレジスタの最初のアドレス
+    * 前者はPi2と3、後者はPi4用
     * bcm2835のpdfには書いてない
     * このアドレスの後のレジスタの配置は同じ（Peripheral specification90,91ページ）
   * 0xA0: 必要なアドレスの範囲（91ページを読んで設定）
@@ -640,7 +641,7 @@ static int __init init_mod(void)
 {
  int retval;
 
- gpio_base = ioremap_nocache(0x3f200000, 0xA0); //追加
+ gpio_base = ioremap_nocache(0x3f200000, 0xA0); //Pi4の場合は0xfe200000
 ...
 ```
 
@@ -663,7 +664,7 @@ static int __init init_mod(void)
 {
     int retval;
 
-    gpio_base = ioremap_nocache(0x3f200000, 0xA0); //0x3f..:base address, 0xA0: region to map
+    gpio_base = ioremap_nocache(0x3f200000, 0xA0); 
 
     const u32 led = 25;
     const u32 index = led/10;//GPFSEL2
