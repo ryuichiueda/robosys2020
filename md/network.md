@@ -1,284 +1,303 @@
-## ロボットシステム学2016第13回
+# ロボットシステム学第8回<span style="font-size:50%">（第7回が簡単だった人用）</span>
 
 上田 隆一
 
-2019年12月20日@千葉工業大学
+千葉工業大学
 
 ---
 
-<h2>ロボットと通信</h2>
-<ul>
- 	<li>自律分散系には必須ですね
-<ul>
- 	<li>そうですよね？</li>
-</ul>
-</li>
- 	<li>使いますよね
-<ul>
- 	<li>リモート監視・操作等</li>
- 	<li>環境に埋め込んだセンサやアクチュエータの操作</li>
- 	<li>ソフトウェアのインストール</li>
-</ul>
-</li>
- 	<li><span style="color: #ff0000;">必須 </span></li>
-</ul>
+## ロボットと通信
+
+* ロボットを扱うときは同時に通信も扱っている
+    * そうですよね？<br />　
+* 用途
+    * リモート監視・操作等
+    * 環境に埋め込んだセンサやアクチュエータの操作
+    * ソフトウェアのインストール
+
+
+<span style="color:red;">必須 </span>
 
 ---
 
-<h2>本日の内容</h2>
-<ul>
- 	<li>ネットワーク関係の設定方法を一通りおさえる</li>
- 	<li>イーサネット・TCP/IP IP
-<ul>
- 	<li>アドレス・ポート</li>
- 	<li>ソケット通信については前期やったそうなので割愛</li>
-</ul>
-</li>
- 	<li>ssh</li>
-</ul>
+## 本日の内容
+
+* ネットワーク関係の設定方法を一通りおさえる<br />　
+* イーサネット・TCP/IP
+    * アドレス・ポート
+    * 通信してみる<br />　
+* ssh
 
 ---
 
-<h2>IPアドレスの体系</h2>
-<ul>
- 	<li>計算機の住所（ただし複数持つことができる）</li>
- 	<li>IPアドレス: 0-255の数字を4つドットでつないで表記
-<ul>
- 	<li>例: 192.168.0.1</li>
- 	<li>ローカルのものとグローバルのものが存在
-<ul>
- 	<li>グローバル
-<ul>
- 	<li>世界中でその計算機しか持っていない</li>
-</ul>
-</li>
- 	<li>ローカル（プライベートIPアドレス）
-<ul>
- 	<li>閉じた環境で使うアドレス</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+## IPアドレスの体系
+
+* 計算機の住所
+    * 細かく説明するとネットワークカードに割り当て
+        * 複数割り当てすることも可能<br />　
+* IPアドレス（IPv4）
+    * 0-255の数字を4つドットでつないで表記
+        * 例: 192.168.0.1
+    * ローカルのものとグローバルのものが存在
+        * グローバルIPアドレス
+            * 世界中でその計算機しか持っていない
+        * ローカル（プライベートIPアドレス）
+            * 閉じた環境で使うアドレス
 
 ---
 
-<h2>ネットワーク部・ホスト部</h2>
-<ul>
- 	<li>IPアドレスを2進数で書いた時、左側の何桁かは「ネットワーク部」を表し、残りは「ホスト部」を表す</li>
- 	<li>ネットワーク部
-<ul>
- 	<li>インターネットの中の一つのグループ</li>
-</ul>
-</li>
- 	<li>ホスト部
-<ul>
- 	<li>各PC固有の番号（住所で言うと番地）</li>
-</ul>
-</li>
- 	<li>サブネットマスク
-<ul>
- 	<li>どの部分がネットワーク部を表すかを示す数字</li>
- 	<li>例: 255.255.255.0
-<ul>
- 	<li>2進数にすると11111111.11111111.11111111.00000000</li>
- 	<li>ということで、左から24ビットがネットワーク部</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+## ネットワーク部・ホスト部
+
+* IPアドレスを2進数で書いた時、
+    * 左側の何桁かは「ネットワーク部」
+        * インターネットの中の一つのグループ
+    * 残りは「ホスト部」
+        * 各PC固有の番号（住所で言うと番地）<br />　
+* サブネットマスク
+    * どの部分がネットワーク部を表すかを示す数字
+        * 例: 255.255.255.0
+            * 2進数にすると11111111.11111111.11111111.00000000
+            * ということで、左から24ビットがネットワーク部
 
 ---
 
-<ul>
- 	<li>表記の例
-<ul>
- 	<li>192.168.1.2/255.255.255.0
-<ul>
- 	<li>192.168.1がネットワーク部で2がホスト部</li>
- 	<li>192.168.1.2/24という書き方もある
-<ul>
- 	<li>左側24ビットがネットワーク部</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
- 	<li>コマンドで確かめてみましょう
-<ul>
- 	<li>
-<pre><span style="color: #ffffff;">$ ip addr
-...
-<span class="s1">3: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-</span><span class="s1">link/ether b8:27:eb:62:a8:84 brd ff:ff:ff:ff:ff:ff
-</span><span class="s1">inet 192.168.0.4/24 brd 192.168.0.255 scope global eth0</span>
-...
-</span></pre>
-</li>
-</ul>
-</li>
-</ul>
+## IPアドレスの表記の例
+
+ * 192.168.1.2/255.255.255.0
+    * 192.168.1がネットワーク部で2がホスト部
+    * 192.168.1.2/24という書き方もある
+ 	* 左側24ビットがネットワーク部という意味<br />　
+ * コマンドで確かめてみましょう
+    * `ip a`（`ip addr`）を利用（読み方は次ページ）
+
+<span style="font-size:75%">
+
+```
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+（略）
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether dc:a6:32:8d:10:ba brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.6/24 brd 192.168.1.255 scope global dynamic eth0
+（略）
+```
+
+</span>
 
 ---
 
-<h2>ルーティング</h2>
-<ul>
- 	<li>別のネットワーク部にある計算機には無条件でアクセスできない
-<ul>
- 	<li>別のネットワークにパケットを出す設定が必要
-<ul>
- 	<li>計算機で設定しなければならないこと
-（DHCPを使っていると自動で設定されているので気がつかない）
-<ul>
- 	<li>外にパケットを出すときにどのルータに送るか</li>
- 	<li>どのIPアドレスが内側のものなのか</li>
-</ul>
-</li>
-</ul>
-</li>
- 	<li><span style="color: #ff0000;">ルータがネットワークの境界にいて交通整理</span>
-<ul>
- 	<li>「ルーティング」</li>
- 	<li>tracerouteを打ってみましょう（次ページ）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+## <span style="text-transform:none">ip a</span>の主な項目
+
+* `lo, eth0, wlan0`: ネットワークデバイス
+  * `lo`は自分自身を指す特殊なデバイス
+* `link`の横の`dc:a6:32:8d:10:ba`など: MACアドレス
+* `inet, inet6`の横: IPアドレス
+
+<span style="font-size:75%">
+
+```
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether dc:a6:32:8d:10:ba brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.6/24 brd 192.168.1.255 scope global dynamic eth0
+       valid_lft 83344sec preferred_lft 83344sec
+    inet6 240d:1a:a5c:6600:dea6:32ff:fe8d:10ba/64 scope global dynamic mngtmpaddr noprefixroute
+       valid_lft 5637sec preferred_lft 5637sec
+    inet6 fe80::dea6:32ff:fe8d:10ba/64 scope link
+       valid_lft forever preferred_lft forever
+3: wlan0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether dc:a6:32:8d:10:bb brd ff:ff:ff:ff:ff:ff
+```
+
+</span>
 
 ---
 
-<pre><span style="color: #ffffff;">$ traceroute 8.8.8.8</span>
-<span style="color: #ffffff;">traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets</span>
-<span style="color: #ffffff;">1  133.242.186.1 (133.242.186.1)  1.073 ms  1.062 ms  1.047 ms</span>
-<span style="color: #ffffff;">2  iskrt102b-rt109e.bb.sakura.ad.jp (103.10.114.73)  1.003 ms iskrt101b-rt109e.bb.sakura.ad.jp (103.10.114.65)  1.013 ms iskrt102b-rt109e.bb.sakura.ad.jp (103.10.114.73)  1.010 ms</span>
-<span style="color: #ffffff;">3  iskrt1s-rt101b-2.bb.sakura.ad.jp (103.10.113.93)  0.976 ms iskrt2s-rt102b-2.bb.sakura.ad.jp (103.10.113.105)  0.974 ms iskrt1s-rt101b-1.bb.sakura.ad.jp (103.10.113.9)  0.956 ms</span>
-<span style="color: #ffffff;">4  iskrt3-rt2s.bb.sakura.ad.jp (103.10.113.113)  2.061 ms iskrt3-rt1s.bb.sakura.ad.jp (103.10.113.109)  2.050 ms iskrt4-rt2s.bb.sakura.ad.jp (103.10.113.121)  0.892 ms</span>
-<span style="color: #ffffff;">5  tkort3-iskrt3.bb.sakura.ad.jp (157.17.131.33)  16.704 ms tkert1-iskrt4.bb.sakura.ad.jp (157.17.131.37)  20.049 ms tkort3-iskrt3.bb.sakura.ad.jp (157.17.131.33)  16.672 ms</span>
-<span style="color: #ffffff;">6  as15169.ix.jpix.ad.jp (210.171.224.96)  20.114 ms  19.862 ms tkort3-ert1.bb.sakura.ad.jp (157.17.130.113)  18.166 ms</span>
-<span style="color: #ffffff;">7  as15169.ix.jpix.ad.jp (210.171.224.96)  21.424 ms 108.170.242.161 (108.170.242.161)  20.457 ms as15169.ix.jpix.ad.jp (210.171.224.96)  21.547 ms</span>
-<span style="color: #ffffff;">8  209.85.255.141 (209.85.255.141)  21.071 ms 108.170.242.193 (108.170.242.193)  22.333 ms 72.14.239.193 (72.14.239.193)  21.048 ms</span>
-<span style="color: #ffffff;">9  72.14.238.173 (72.14.238.173)  22.553 ms 72.14.239.31 (72.14.239.31)  19.628 ms google-public-dns-a.google.com (8.8.8.8)  17.074 ms</span></pre>
+## ルーティング
+
+* 別のネットワーク部にある計算機には無条件でアクセスできない
+    * 別のネットワークにパケットを出す設定が必要
+ 	* 計算機で設定しなければならないこと（DHCPを使っていると自動で設定されているので気がつかない）
+ 	    * どのIPアドレスへのパケットを外に出すのか
+ 	    * 外にパケットを出すときにどのネットワークデバイスから送るか<br />　
+* <span style="color:red">ルータがネットワークの境界にいて交通整理</span>
+   * 「ルーティング」
+   * tracerouteを打ってみましょう（次ページ）
 
 ---
 
-<ul>
- 	<li>ルーティング情報の閲覧・設定
-<ul>
- 	<li> route(8)を使います</li>
- 	<li>下の例の読み方
-<ul>
- 	<li>255.255.254.0でマスクをかけた時のIPアドレスが一致すればeth0から相手のIPアドレスに直接送信</li>
- 	<li>それ以外の場合はeth0から
-「デフォルトゲートウェイ」133.242.186.1に送信</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre class="p1"><span style="color: #ffffff;"><span class="s1">ueda\@remote</span><span class="s2">:</span><span class="s3">~</span><span class="s2">$ route
-</span><span class="s1">カーネルIP経路テーブル
-</span><span class="s1">受信先サイト<span class="Apple-converted-space">    </span>ゲートウェイ<span class="Apple-converted-space">    </span>ネットマスク <span class="Apple-converted-space">  </span>フラグ Metric Ref 使用数 インタフェース
-</span><span class="s1">default <span class="Apple-converted-space">        </span>133.242.186.1 <span class="Apple-converted-space">  </span>0.0.0.0 <span class="Apple-converted-space">        </span>UG<span class="Apple-converted-space">    </span>0<span class="Apple-converted-space">      </span>0<span class="Apple-converted-space">        </span>0 eth0
-</span><span class="s1">localnet<span class="Apple-converted-space">        </span>* <span class="Apple-converted-space">              </span>255.255.254.0 <span class="Apple-converted-space">  </span>U <span class="Apple-converted-space">    </span>0<span class="Apple-converted-space">      </span>0<span class="Apple-converted-space">        </span>0 eth0</span></span></pre>
+```
+$ traceroute 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  _gateway (160.16.96.1)  0.227 ms  0.170 ms  0.160 ms
+ 2  tkgrt1b-grt25e.bb.sakura.ad.jp (157.17.135.1)  19.745 ms tkgrt1b-grt25e-2.bb.sakura.ad.jp (157.17.135.17)  19.720 ms tkgrt1b-grt25e.bb.sakura.ad.jp (157.17.135.1)  19.682 ms
+ 3  tkgrt1s-grt1b-2.bb.sakura.ad.jp (157.17.130.177)  0.292 ms  0.308 ms tkwrt1s-grt1b-2.bb.sakura.ad.jp (157.17.130.185)  0.364 ms
+ 4  tkort4-wrt1s-3.bb.sakura.ad.jp (157.17.131.145)  1.000 ms tkort4-wrt1s.bb.sakura.ad.jp (157.17.131.81)  0.756 ms tkort4-grt1s.bb.sakura.ad.jp (157.17.130.249)  0.646 ms
+ 5  as15169.ix.jpix.ad.jp (210.171.224.96)  0.986 ms  0.966 ms  0.950 ms
+ 6  108.170.242.97 (108.170.242.97)  1.093 ms 108.170.242.129 (108.170.242.129)  2.402 ms 108.170.242.97 (108.170.242.97)  1.227 ms
+ 7  72.14.234.199 (72.14.234.199)  1.220 ms 108.170.233.79 (108.170.233.79)  1.149 ms 108.170.233.15 (108.170.233.15)  1.249 ms
+ 8  dns.google (8.8.8.8)  1.199 ms  1.226 ms  1.362 ms
+```
 
 ---
 
-<h2>デフォルトゲートウェイの追加・削除</h2>
-<ul>
- 	<li>やってみましょう。</li>
-</ul>
-<pre><span style="color: #ffffff;">ueda\@ubuntu16:~$ route -n</span>
-<span style="color: #ffffff;">カーネルIP経路テーブル</span>
-<span style="color: #ffffff;">受信先サイト    ゲートウェイ    ネットマスク   フラグ Metric Ref 使用数 インタフェース</span>
-<span style="color: #ffffff;">0.0.0.0         192.168.2.1     0.0.0.0         UG    0      0        0 enp0s3</span>
-<span style="color: #ffffff;">192.168.2.0     0.0.0.0         255.255.255.0   U     0      0        0 enp0s3</span>
-<span style="color: #ffffff;">ueda\@ubuntu16:~$ sudo route del default gw 192.168.2.1</span>
-<span style="color: #ffffff;">ueda\@ubuntu16:~$ ping 8.8.8.8 #パケットが外に行かない</span>
-<span style="color: #ffffff;">connect: Network is unreachable</span>
-<span style="color: #ffffff;">ueda\@ubuntu16:~$ sudo route add default gw 192.168.2.1</span>
-<span style="color: #ffffff;">ueda\@ubuntu16:~$ ping 8.8.8.8 #今度はうまくいく</span>
-<span style="color: #ffffff;">PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.</span>
-<span style="color: #ffffff;">64 bytes from 8.8.8.8: icmp_seq=1 ttl=54 time=4.50 ms</span>
-<span style="color: #ffffff;">...</span></pre>
+## ルーティング情報の閲覧・設定
+
+* `routel`あるいは`ip r`（`ip route`）を使います
+  * 主な項目
+    * `target`: 宛先、`gateway`: どこを通るか、`source`: パケット発生元、<br />`dev`: ネットワークデバイス
+
+<span style="font-size:80%">
+
+```
+$ routel
+         target            gateway          source    proto    scope    dev tbl
+        default        192.168.1.1     192.168.1.6     dhcp            eth0
+   192.168.1.0/ 24                     192.168.1.6   kernel     link   eth0
+    192.168.1.1                        192.168.1.6     dhcp     link   eth0
+      127.0.0.0          broadcast       127.0.0.1   kernel     link     lo local
+     127.0.0.0/ 8            local       127.0.0.1   kernel     host     lo local
+      127.0.0.1              local       127.0.0.1   kernel     host     lo local
+127.255.255.255          broadcast       127.0.0.1   kernel     link     lo local
+    192.168.1.0          broadcast     192.168.1.6   kernel     link   eth0 local
+    192.168.1.6              local     192.168.1.6   kernel     host   eth0 local
+  192.168.1.255          broadcast     192.168.1.6   kernel     link   eth0 local
+（以下、IPv6の情報）
+```
+
+</span>
 
 ---
 
-<h2>IPアドレスの設定</h2>
-<ul>
- 	<li>有線（Raspberry Piの場合）
-<ul>
- 	<li>最初からDHCPに設定されている</li>
- 	<li>通常はこのままDHCPで良い
-<ul>
- 	<li>固定すると別の環境でログインできなくなる等、難しくなる</li>
-</ul>
-</li>
-</ul>
-</li>
- 	<li>IPアドレスはルータのウェブページ、nmap等で確認可能
-<ul>
- 	<li>
-<pre><span style="color: #ffffff;">$ nmap -sP 192.168.2.0/24</span></pre>
-</li>
-</ul>
-</li>
- 	<li>DHCPでもルータ等で固定できる</li>
-</ul>
+## デフォルトゲートウェイの追加・削除
+
+やってみましょう
+
+```
+### ip rのdefaultの項目をチェック ###
+$ ip r
+default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.6 metric 100
+（略）
+### 消す ###
+$ sudo ip r del default
+$ ip r
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.6
+192.168.1.1 dev eth0 proto dhcp scope link src 192.168.1.6 metric 100
+### 外にパケットが行かなくなる ###
+$ ping 8.8.8.8
+ping: connect: ネットワークに届きません
+### 戻す ###
+$ sudo ip r add default via 192.168.1.1 dev eth0
+（ip rやpingで確認を）
+```
 
 ---
 
-<h2>固定IPの設定</h2>
-<ul>
- 	<li>/etc/network/interfacesに設定を書く
-<ul>
- 	<li>下図: デフォルトの設定例（バージョンによって異なる）</li>
-</ul>
-</li>
-</ul>
-<pre><span style="color: #ffffff;">pi\@raspberrypi ~ $ cat /etc/network/interfaces</span>
-<span style="color: #ffffff;">auto lo</span>
-<span style="color: #ffffff;">iface lo inet loopback</span>
+## ネットワークの設定（DHCP）
 
-<span style="color: #ffffff;">iface eth0 inet dhcp </span></pre>
+* これまでの講義での`eth0`の設定
+  * DHCPで設定されている
+    * DHCP: dynamic host configuration protocol 
+      * ローカルネットワーク上にサーバ（大抵はルータがその役をしている）がいてIPアドレスなどを勝手に設定してくれる
+  * 通常はこのままDHCPでよい
+    * 固定すると別の環境でログインできなくなる等、難しくなる
+    * ルータ側でDHCPのままIPアドレスを固定できる
 
 ---
 
-<ul>
- 	<li>固定にする例
-<ul>
- 	<li>DHCPでもらったアドレスと同じネットワーク部を持つ別のアドレスに変えてみましょう</li>
-</ul>
-</li>
- 	<li>
-<pre><span style="color: #ffffff;">pi\@raspberrypi ~ $ cat /etc/network/interfaces</span>
-<span style="color: #ffffff;">auto lo</span>
+## IPアドレスの確認
 
-<span style="color: #ffffff;">iface lo inet loopback</span>
-<span style="color: #ffffff;">#iface eth0 inet dhcp</span>
-<span style="color: #ffffff;">auto eth0</span>
-<span style="color: #ffffff;">iface eth0 inet static</span>
-<span style="color: #ffffff;">address 192.168.1.200</span>
-<span style="color: #ffffff;">netmask 255.255.255.0</span>
-<span style="color: #ffffff;">gateway 192.168.1.1</span></pre>
-<ul>
- 	<li>dhcpの設定は#でコメントアウトを</li>
- 	<li>設定後はrebootするのが素直</li>
- 	<li>したくない時は</li>
- 	<li>
-<pre><span style="color: #ffffff;">$ sudo service networking restart</span></pre>
-</li>
-</ul>
-</li>
-</ul>
+
+* IPアドレスはルータのウェブページ、`nmap`、`arp`等で確認可能
+  * Windowsの場合はコマンドプロンプトで`arp`を使用
+    * WSLだと`nmap`や`arp`の使用には制限があるので注意
+    * MACアドレスからラズパイを特定
+      * ラズパイ3以前だと`B8:27:EB:...`、ラズパイ4以降だと`DC:A6:32`
+
+```
+$ arp -a
+? (192.168.1.7) at 00:22:58:91:3c:9e [ether] on wlp2s0
+? (192.168.1.14) at 60:84:bd:b5:94:72 [ether] on wlp2s0
+? (192.168.1.6) at dc:a6:32:8d:10:ba [ether] on wlp2s0
+（以下略）
+```
+
 
 ---
 
-<h2>ポート</h2>
+## ネットワークの設定（手動）
+
+* 新しいUbuntu（18.04以降）ではnetplanを利用
+  * `/etc/netplan/99-home.yaml`などと二桁の数字をつけて設定ファイルを作成
+    * `99`にしておくと、他のファイル（`01-network-manager-all.yaml`や`50-cloud-init.yaml`）などよりあとに読まれて設定が反映される
+* 設定例
+
+<span style="font-size:75%">
+
+```
+$ cat /etc/netplan/99-home.yaml     #←このファイルを作る
+network:
+    ethernets:
+        eth0:
+            dhcp4: no                          #dhcp使わない
+            addresses: [192.168.1.101/24]      #IPアドレス
+            gateway4: 192.168.1.1              #デフォルトゲートウェイ
+            nameservers:                       #DNSサーバ（後述）
+                addresses: [8.8.8.8,8.8.4.4]
+            optional: true                     #接続失敗しても待たない（固まらない）
+    version: 2
+$ sudo netplan apply
+（通信が途切れる）
+$ ssh ubuntu@192.168.1.101    #←接続しなおし
+```
+
+</span>
+
+---
+
+## WiFiの設定（DHCP）
+
+* 別のファイルに次のように設定
+  * `access-points`: SSID、ESSID
+  * `password`: キー
+
+<span style="font-size:75%">
+
+```
+$ cat /etc/netplan/98-home-wifi.yaml
+network:
+    wifis:
+        wlan0:
+            dhcp4: true     #dhcpを使いたくなければnoにしてaddresses、gateway4、nameserversを設定
+            optional: true
+            access-points:
+                "ueda":
+                    password: ahoahoahoahoa
+    version: 2
+$ sudo netplan apply
+$ ip a
+### ↓いろいろ割愛してます ###
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    inet 192.168.1.101/24 brd 192.168.1.255 scope global eth0
+3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    inet 192.168.1.6/24 brd 192.168.1.255 scope global dynamic wlan0
+```
+
+</span>
+
+
+---
+
+## ポート
+
 <ul>
  	<li>ポート= port、港</li>
  	<li>計算機が役所のようなものだとすればポートは窓口
@@ -306,7 +325,7 @@
 
 ---
 
-<h2>/etc/services</h2>
+## /etc/services
 <ul>
  	<li>よく使われるポート番号を表にしたもの
 <ul>
@@ -327,7 +346,7 @@
 
 ---
 
-<h2>名前解決</h2>
+## 名前解決
 <ul>
  	<li>IPアドレスとホスト名（www.yahoo.co.jp等）はどう変換される？</li>
  	<li>DNSサーバ
@@ -353,7 +372,7 @@
 
 ---
 
-<h2>WiFiの設定</h2>
+## WiFiの設定
 <ul>
  	<li>WiFi標準搭載のRaspberry Pi3の場合を例に</li>
  	<li>準備
@@ -372,7 +391,7 @@
 
 ---
 
-<h2>アクセスポイントに接続</h2>
+## アクセスポイントに接続
 <ul>
  	<li>接続したいアクセスポイントのSSID（ESSID）とパスフレーズをwpa_passphrase(1)に指定して設定ファイル（wpa_supplicant.conf）を作る</li>
 </ul>
