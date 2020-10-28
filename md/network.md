@@ -271,153 +271,76 @@ $ ssh ubuntu@192.168.1.101    #←接続しなおし
 
 <span style="font-size:75%">
 
+---
+
+## WiFiの設定（省電力設定off）
+
+* 省電力設定を切らないと不安定になることがある
+* 手順
+  * `cron`の設定を編集（エディタを選ばされるので、適当に選ぶ）
 ```
-$ cat /etc/netplan/98-home-wifi.yaml
-network:
-    wifis:
-        wlan0:
-            dhcp4: true     #dhcpを使いたくなければnoにしてaddresses、gateway4、nameserversを設定
-            optional: true
-            access-points:
-                "ueda":
-                    password: ahoahoahoahoa
-    version: 2
-$ sudo netplan apply
-$ ip a
-### ↓いろいろ割愛してます ###
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    inet 192.168.1.101/24 brd 192.168.1.255 scope global eth0
-3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
-    inet 192.168.1.6/24 brd 192.168.1.255 scope global dynamic wlan0
+$ sudo crontab -e
+```
+    * エディタが開いたら、一番下に次のように記述
+```
+@reboot /sbin/iwconfig wlan0 power off
+```
+  * 再起動して`iwconfig`（なければインストール）で確認
+    * `Power Management:off`となっていなければもう一度`sudo crontab -e`で確認
+```
+$ iwconfig
+（略）
+wlan0     IEEE 802.11  ESSID:"tako"
+（略）
+          Power Management:off   ←←←offを確認！！
+（略）
 ```
 
-</span>
+
+
 
 
 ---
 
 ## ポート
 
-<ul>
- 	<li>ポート= port、港</li>
- 	<li>計算機が役所のようなものだとすればポートは窓口
-<ul>
- 	<li>窓口は65536*2個ある
-<ul>
- 	<li>TCP（Transmission Control Protocol）0 番～65,535 番</li>
- 	<li>UDP（User Datagram Protocol）0 番～65,535 番</li>
-</ul>
-</li>
-</ul>
-</li>
- 	<li>インターネット上のサービスを利用するときは
-<ul>
- 	<li>IPアドレスとプロトコル、ポート番号を指定している</li>
- 	<li>IP アドレス: 住所</li>
- 	<li>ポート: 窓口
-<ul>
- 	<li>窓口の後ろにサービスを提供する人（サーバ）がいる</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+* ポート= port、港
+* 計算機が役所のようなものだとすればポートは窓口
+  * 窓口は65536*2個ある
+    * TCP（Transmission Control Protocol）0 番～65,535 番
+    * UDP（User Datagram Protocol）0 番～65,535 番<br />　
+* インターネット上のサービスを利用しているとき
+  * IPアドレスとプロトコル、ポート番号を指定している
+    * 例
+      * ラズパイにssh接続: ラズパイのIPアドレスとTCP22番ポート
+      * ブラウザに`https://b.ueda.tech`と指定: 160.16.96.252のTCP443ポート
+    * ポートの後ろにサービスを提供する人（サーバ）がいる
+    * なぜURLがIPアドレスに変わるかは後述
 
 ---
 
-## /etc/services
-<ul>
- 	<li>よく使われるポート番号を表にしたもの
-<ul>
- 	<li>大抵のLinuxには入っている</li>
- 	<li>端末からless等で読んでみましょう</li>
-</ul>
-</li>
- 	<li>必ずしもサーバがこのポート番号を使う必要はないが、標準的なものにしておくと使うときに調べなくていい
-<ul>
- 	<li>HTTP: TCP80, HTTPS: TCP443, SSH: TCP22, ...</li>
-</ul>
-</li>
- 	<li>
-<p class="p1"><span class="s1">$ netstat -antuで現在使っているポートの番号を調べ、
-どのサービスが通常使うポートか/etc/servicesで調査してみましょう</span></p>
-</li>
-</ul>
+## <span style="text-transform:none">/etc/services</span>
+
+* よく使われるポート番号を表にしたもの
+  * 大抵のLinuxには入っている
+  * 端末からless等で読んでみましょう<br />　
+* 必ずしもサーバがこのポート番号を使う必要はないが、標準的なものにしておくと使うときに調べなくてよい
+  * HTTP: TCP80, HTTPS: TCP443, SSH: TCP22, ...<br />　
+* 演習
+  * `netstat -antu`で現在使っているポートの番号を調べ、どのサービスが通常使うポートか/etc/servicesで調査してみましょう
 
 ---
 
 ## 名前解決
-<ul>
- 	<li>IPアドレスとホスト名（www.yahoo.co.jp等）はどう変換される？</li>
- 	<li>DNSサーバ
-<ul>
- 	<li>IPアドレスとホストを管理</li>
- 	<li>ブラウザやpingでホスト名が指定されるとDNSサーバに問い合わせが行く
-<ul>
- 	<li>DNSサーバのIPアドレスは通常/etc/resolv.confに書く（DHCPを使っていると勝手に書かれている）
-<ul>
- 	<li>最近はresolv.confを使わない方向に</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
- 	<li>/etc/hosts
-<ul>
- 	<li>静的にIPアドレスとホストを対応付けたい時に編集</li>
-</ul>
-</li>
-</ul>
 
----
+* IPアドレスとホスト名（www.yahoo.co.jp 等）はどう変換される？<br />　
+* DNS（Domain Name System）サーバ
+  * IPアドレスとホストを管理
+  * ブラウザやpingなどでホスト名が指定されるとDNSサーバに問い合わせが行く
+    * DNSサーバのIPアドレスは`/etc/resolv.conf`に書くが、最近は自動設定されるので編集しても上書きされる
+      * netplanの設定ファイルに書いて、`/etc/resolv.conf`に反映<br />　
+* `/etc/hosts`
+  * 静的にIPアドレスとホストを対応付けたい時に編集
+    * DNSよりこちらが優先
+      * ウェブサイトを作るときにブラウザを騙す用途で使うこともある
 
-## WiFiの設定
-<ul>
- 	<li>WiFi標準搭載のRaspberry Pi3の場合を例に</li>
- 	<li>準備
-<ul>
- 	<li>iwconfigでwlan0があることを確認</li>
-</ul>
-</li>
-</ul>
-<pre><span style="color: #ffffff;">$ sudo apt install wireless-tools</span>
-<span style="color: #ffffff;">$ sudo apt install wpasupplicant</span>
-<span style="color: #ffffff;">$ iwconfig</span>
-<span style="color: #ffffff;"> wlan0     IEEE 802.11bgn  ESSID:off/any</span>
-<span style="color: #ffffff;">           Mode:Managed  Access Point: Not-Associated</span>
-<span style="color: #ffffff;">           Retry short limit:7   RTS thr:off   Fragment thr:off</span>
-<span style="color: #ffffff;">           Power Management:on</span></pre>
-
----
-
-## アクセスポイントに接続
-<ul>
- 	<li>接続したいアクセスポイントのSSID（ESSID）とパスフレーズをwpa_passphrase(1)に指定して設定ファイル（wpa_supplicant.conf）を作る</li>
-</ul>
-<pre><span style="color: #ffffff;">$ sudo -s</span>
-<span style="color: #ffffff;"> # wpa_passphrase SSID パスフレーズ &gt; /etc/wpa_supplicant/wpa_supplicant.conf</span></pre>
-
----
-
-<ul>
- 	<li> /etc/network/interfacesに必要事項を書く
-<ul>
- 	<li>ホットプラグ</li>
- 	<li>wpa_supplicant.confの場所</li>
- 	<li>IPアドレス周り</li>
- 	<li>パワーマネージメントを切っておくと安定</li>
-</ul>
-</li>
-</ul>
-<pre><span style="color: #ffffff;">$ sudo cat /etc/network/interfaces</span>
-<span style="color: #ffffff;">（略 lo, eth0の設定）</span>
-<span style="color: #ffffff;">auto wlan0</span>
-<span style="color: #ffffff;">allow-hotplug wlan0</span>
-<span style="color: #ffffff;">iface wlan0 inet dhcp</span>
-<span style="color: #ffffff;">wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf</span>
-<span style="color: #ffffff;">wireless-power off
-</span></pre>
-<ul>
- 	<li>再起動（あるいはsudo ifup wlan0, sudo service networking restart）</li>
-</ul>
