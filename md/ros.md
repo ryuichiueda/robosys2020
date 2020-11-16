@@ -1,8 +1,6 @@
-# ロボットシステム学第13回
+# ロボットシステム学第10回
 
 上田 隆一
-
-2019年12月6日@千葉工業大学
 
 ---
 
@@ -30,14 +28,13 @@
 ## どんなものか
 
 * 本体: プロセス間通信をつかさどる
-  * プロセス同士をpublish-subscribeモデルやサービスでつなぐ
+  * プロセス同士をpublish-subscribeモデルやclient-serverモデルでつなぐ
   * XML-RPC等を利用
-  * 通信するデータに型
+  * 通信するデータに型<br />　
 * 周辺
   * ビルドシステム、パッケージ管理、テストツール、・・・
 
-
-<span style="color:red;font-size:50%">と書いてもよくわからんのでこちらで動かしてみます</span>
+<span style="color:red;font-size:70%">と書いてもよくわからんのでこちらで動かしてみます</span>
 
 
 
@@ -97,42 +94,18 @@
 
 ## ROSのインストール
 
-* Ubuntu 18.04にインストールして使用
-  * [GitHubのリポジトリ](https://github.com/ryuichiueda/ros_setup_scripts_Ubuntu18.04_server)にインストーラ
-    * 中にあるシェルスクリプトをstep0.bash, step1.bash, locale.ja.bashと実行すればOK<br />　
-* 講義ではインストール済みのイメージファイルを利用
-  * [このページ](https://b.ueda.tech/?post=20190618_raspimouse)の「Raspberry Pi 3B+用のUbuntu 18.04にROSをインストールしたもの」
-
----
-
-## 動作確認
-
-* `roscore`
+* Ubuntu 20.04にインストールして使用
+  * [GitHubのリポジトリ](https://github.com/ryuichiueda/ros_setup_scripts_Ubuntu20.04_server)にインストーラ
+    * 中にあるシェルスクリプト`step0.bash`、`step1.bash`を実行すればOK
+* `roscore`と打つ
   * ROSの基盤となるプログラムが立ち上がる
   * Ctrl+cで出る
 
 ```bash
 $ roscore
 （略）
-started roslaunch server http://localhost:39310/
-ros_comm version 1.12.6
-
-SUMMARY
-========
-
-PARAMETERS
-* /rosdistro: melodic
-* /rosversion: 1.12.6
-
-NODES
-
-auto-starting new master
-process[master]: started with pid [1439]
-ROS_MASTER_URI=http://localhost:11311/
-
-setting /run_id to b749a100-d0dc-11e5-a506-b827eb17cb96
-process[rosout-1]: started with pid [1452]
 started core service [/rosout]
+（立ち上がりっぱなしに）
 ```
 
 ---
@@ -152,7 +125,7 @@ CMakeLists.txt
 ```
   * .bashrcの末尾に以下を記述
 ```bash
-source /opt/ros/melodic/setup.bash          #これは元からある
+source /opt/ros/noetic/setup.bash          #これは元からある
 source ~/catkin_ws/devel/setup.bash         #ここから3行追加
 export ROS_MASTER_URI=http://localhost:11311
 export ROS_HOSTNAME=localhost
@@ -171,7 +144,7 @@ $ source ~/.bashrc
     * ROS_PACKAGE_PATHにcatkin_ws/srcがセットされているはず
 ```bash
 $ echo $ROS_PACKAGE_PATH
-/home/ubuntu/catkin_ws/src:/opt/ros/melodic/share
+/home/ubuntu/catkin_ws/src:/opt/ros/noetic/share
 ```
 
 ---
@@ -179,7 +152,7 @@ $ echo $ROS_PACKAGE_PATH
 ## ROSのノード
 
 * プログラムのプロセス一つ一つが「ノード」と呼ばれる
-* ノードの使用例（seiga-k/sysmon_rosパッケージを使う）
+* ノードの使用例（`seiga-k/sysmon_ros`パッケージを使う）
   * ハードウェアの状態をモニタするROSパッケージをインストール
 ```
 $ sudo apt install ros-melodic-roslint 
@@ -298,17 +271,17 @@ while not rospy.is_shutdown():
 
 ## ノードの実行
 
-注意: あらかじめroscoreを立ち上げておきましょう。
 
 ```bash
-$ rosrun mypkg count.py
+端末1$ roscore
+端末2$ rosrun mypkg count.py
 ```
 
 * rosnode listとrostopic listでノードとトピックの確認を
 * 次にrostopic echoでcount_upからデータを取り出してみましょう
 
 ```
-$ rostopic echo /count_up 
+端末3$ rostopic echo /count_up 
 data: 1430
 ---
 data: 1431
