@@ -406,12 +406,15 @@ $ rosrun mypkg twice.py
 
 ---
 
-## パブリッシャとサブスクライバの同居
+## ノードの作成3
 
-* twice.pyにパブリッシャを追加
+* データを受け取って加工するノード
+  * `twice.py`にパブリッシャを追加
+
+<div style="font-size:70%">
 
 ```python
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from std_msgs.msg import Int32
 
@@ -430,6 +433,8 @@ if __name__ == '__main__':
         pub.publish(n)
         rate.sleep()
 ```
+
+</dev>
 
 ---
 
@@ -451,7 +456,7 @@ data: 1056
 
 ---
 
-## その他（1/2）
+## その他
 
 * 型
   * `std_msgs`で定義されているものの他にもたくさん
@@ -468,36 +473,8 @@ data: 1056
 
 ---
 
-## その他（2/2）
+## 参考文献
 
-* package.xml
-  * パッケージの情報が書かれる
-  * メンテナの名前、ライセンス、他のパッケージの依存関係等、配布に必要な情報
-* CMakeLists.txt
-  * ビルド情報
-  * 自分で型を作る、C++でノードを作る等、講義の内容より複雑なことをするときには手を入れる必要がある
-* 参考
-  * [小倉: ROSではじめるロボットプログラミング, 工学社, 2015.](https://www.kohgakusha.co.jp/books/detail/978-4-7775-1901-9)
-  * [上田: Raspberry Piで学ぶ　ROSロボット入門, 日経BP, 2017.](http://ec.nikkeibp.co.jp/item/books/261040.html)
-
---- 
-
-## デモ
-
-* カメラの画像をブラウザから見る
-* 手順
-  * 1: ROS・ワークスペースのセットアップ（来週）
-  * 2: 必要なパッケージのダウンロードとビルド
-    ```bash
-    $ sudo apt install ros-noetic-cv-camera
-    $ sudo apt install ros-noetic-cv-bridge  （必要なら）
-    $ sudo apt install ros-melodic-web-video-server
-    ```
-  * 3: 見る
-    ```
-    $ roscore &
-    $ rosrun cv_camera cv_camera_node &
-    $ rosrun web_video_server web_video_server
-    ブラウザでhttp://<IPアドレス>:8080/stream?topic=/cv_camera/image_raw
-    ```
+* [小倉: ROSではじめるロボットプログラミング, 工学社, 2015.](https://www.kohgakusha.co.jp/books/detail/978-4-7775-1901-9)
+* [上田: Raspberry Piで学ぶ　ROSロボット入門, 日経BP, 2017.](http://ec.nikkeibp.co.jp/item/books/261040.html)
 
