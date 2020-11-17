@@ -255,31 +255,45 @@ data: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 2・・・
 
 ## ROSパッケージの構成
 
+* `web_video_server`の中身を見てみましょう
+```
+ubuntu@ubuntu:~/catkin_ws/src/web_video_server$ l
+AUTHORS.md     CMakeLists.txt  README.md  mainpage.dox  src/
+CHANGELOG.rst  LICENSE         include/   package.xml
+```
+  * `package.xml`: パッケージマニフェスト
+  * `CMakeLists.txt`: CMakeのスクリプト
+  * コード
+    * `src`: ソースコード（.cppファイル）
+    * `include`: ヘッダファイル（.hファイル）
+
+単にコードがあるだけではなく、他人やシステムが使うための情報が整備されている
 
 ---
 
-## ROSプログラミングの準備
+## ROSプログラミング
 
-* パブリッシャ、サブスクライバを作ってみましょう
+* パッケージを作る
+* ノードを作る
+* パブリッシャ、サブスクライバを作る
 
 ---
 
 ## パッケージを作る
 
-* パッケージ: いくつかのノードを含んだ一単位
-* パッケージの生成
-  * `catkin_create_pkg <作るパッケージの名前> [使用するライブラリ...]`
-  * `rospy`: Pythonでノードを作るときに使用
-  * パッケージを作ったら下に`scripts`というディレクトリを作成
-    * ここにノードとなるプログラムを置く
-
+* `catkin_create_pkg`で作成
+  * 作成するパッケージ名、使用するライブラリを指定
 ```bash
 $ cd ~/catkin_ws/src
 $ catkin_create_pkg mypkg rospy
  Created file mypkg/package.xml
  Created file mypkg/CMakeLists.txt
  Created folder mypkg/src
- Successfully created files in /home/ubuntu/catkin_ws/src/mypkg. Please adjust the values in package.xml.
+ Successfully created files in /home/ubuntu/catkin_ws/src/mypkg. （略）
+```
+* パッケージ内に`scripts`というディレクトリを作成
+  * ここにノードとなるプログラムを置く
+```bash
 $ cd mypkg/
 $ mkdir scripts
 $ cd scripts/
@@ -289,25 +303,30 @@ $ cd scripts/
 
 ## パブリッシャを作る
 
-* 次のようなプログラム（count.py）を書いてみましょう
-* ノード名が「count」、パブリッシャが「count_up」
-* rospy.Publisherを作って定期的にデータを投げる
-  * count_upというトピックに、型はInt32で（バッファとなるキューのサイズは1）
+* 下のようなプログラム（count.py）を書いてみましょう
+  * rospy.Publisherを作って定期的にデータを投げる
+    * count_upというトピック
+    * 型はInt32
+    * バッファとなるキューのサイズは1
+
+<div style="font-size:70%">
 
 ```python
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from std_msgs.msg import Int32
 
-rospy.init_node('count')
-pub = rospy.Publisher('count_up', Int32, queue_size=1)
-rate = rospy.Rate(10)
+rospy.init_node('count')                                # ノード名「count」に設定
+pub = rospy.Publisher('count_up', Int32, queue_size=1)  # パブリッシャ「count_up」を作成
+rate = rospy.Rate(10)                                   # 10Hzで実行
 n = 0
 while not rospy.is_shutdown():
     n += 1
     pub.publish(n)
     rate.sleep()
 ```
+
+</div>
 
 ---
 
@@ -316,6 +335,7 @@ while not rospy.is_shutdown():
 
 ```bash
 端末1$ roscore
+端末2$ chmod +x count.py    ←実行できるようにパーミッション設定
 端末2$ rosrun mypkg count.py
 ```
 
