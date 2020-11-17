@@ -301,15 +301,14 @@ $ cd scripts/
 
 ---
 
-## パブリッシャを作る
+## ノードの作成1
 
-* 下のようなプログラム（count.py）を書いてみましょう
-  * rospy.Publisherを作って定期的にデータを投げる
-    * count_upというトピック
-    * 型はInt32
-    * バッファとなるキューのサイズは1
-
+* パブリッシャを1個持つノード`count.py`（下のコード）を記述
+  * `rospy.Publisher`を作って定期的にデータを投げる
+    * `count_up`というトピック
+    * 型はInt32（メッセージには型がある）
 <div style="font-size:70%">
+
 
 ```python
 #!/usr/bin/env python3
@@ -332,17 +331,24 @@ while not rospy.is_shutdown():
 
 ## ノードの実行
 
-
 ```bash
 端末1$ roscore
 端末2$ chmod +x count.py    ←実行できるようにパーミッション設定
 端末2$ rosrun mypkg count.py
 ```
 
-* rosnode listとrostopic listでノードとトピックの確認を
-* 次にrostopic echoでcount_upからデータを取り出してみましょう
+* 動作確認
+  * `rosnode list`と`rostopic list`でノードとトピックの確認を
+  * `rostopic echo`で`count_up`からデータを取り出してみましょう
 
-```
+```bash
+端末3$ rosnode list
+/count
+/rosout
+端末3$ rostopic list
+/count_up
+/rosout
+/rosout_agg
 端末3$ rostopic echo /count_up 
 data: 1430
 ---
@@ -353,17 +359,19 @@ data: 1431
 
 ---
 
-## サブスクライバを作る
+## ノードの作成2
 
-* 次のようなtwice.pyを作る
-* rospy.Subscriberを使う
+* サブスクライバ1個を持つノード`twice.py`（下のコード）を記述
+* `rospy.Subscriber`を使う
   * count_upという名前のトピックを購読する
   * 型はInt32
   * データを受け取ったときにcbという関数で処理
     * コールバック関数
 
+<div style="font-size:70%">
+
 ```python
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from std_msgs.msg import Int32
 
@@ -375,6 +383,8 @@ if __name__ == '__main__':
     sub = rospy.Subscriber('count_up', Int32, cb)
     rospy.spin()
 ```
+
+</div>
 
 ---
 
