@@ -12,8 +12,7 @@
 
 ## <span style="text-transform:none">ROS: robot operating system
 
-* ロボットのソフトウェアコンポーネントを作って
-  動作させるためのフレームワーク/ミドルウェア
+* ロボットのソフトウェアコンポーネントを作って動作させるためのフレームワーク/ミドルウェア
   * OSでは無い
 * 発祥: 2000年代後半、Willow Garage社
 * BSDライセンス
@@ -34,41 +33,18 @@
 * 周辺
   * ビルドシステム、パッケージ管理、テストツール、・・・
 
-<span style="color:red;font-size:70%">と書いてもよくわからんのでこちらで動かしてみます</span>
-
-
+<span style="color:red;font-size:70%">と書いてもよくわからんので使うメリットから</span>
 
 ---
 
-## デモ
-
-* カメラの画像をブラウザから見る
-* 手順
-  * 1: ROS・ワークスペースのセットアップ（来週）
-  * 2: 必要なパッケージのダウンロードとビルド
-    ```bash
-    $ sudo apt install ros-melodic-cv-camera
-    $ sudo apt install ros-melodic-cv-bridge
-    $ sudo apt install ros-melodic-web-video-server
-    ```
-  * 3: 見る
-    ```
-    $ roscore &
-    $ rosrun cv_camera cv_camera_node &
-    $ rosrun web_video_server web_video_server
-    ブラウザでhttp://<IPアドレス>:8080/stream?topic=/cv_camera/image_raw
-    ```
-
----
-
-## さらに便利に使う
-
-* ROS化されている重要ソフトウェア
+## ROS化されている<br />重要ソフトウェア
   * gmapping, cartographer, ナビゲーションメタパッケージ
-    * 地図生成（次のページにデモ）、位置推定、経路生成
+    * 地図生成（次のページにデモ）、位置推定、経路生成<br />　
   * MoveIt!
-    * 腕の動作計画 腕先の位置を入力→関節角を計算（逆運動学）
-  * その他、様々なハード・ソフトがROS化
+    * 腕の動作計画 腕先の位置を入力→関節角を計算（逆運動学）<br />　
+  * 各種センサのインタフェース
+    * すぐ使える
+    * 以前は（特にLinuxでは）自分でシリアル通信のプログラムを書くなどの苦労があった
 
 ---
 
@@ -85,10 +61,10 @@
 
 ## ROSを使ったマニピュレーションの様子
 
-
 * https://twitter.com/i/status/1201399538541400064
   * 2年生有志作
   * 動きはMoveIt!が生成
+    * 自分で計算しなくていい（教員苦笑い）
 
 ---
 
@@ -113,13 +89,15 @@ started core service [/rosout]
 ## ワークスペースの準備
 
 * ワークスペース: 作業場
-  * 構築手順
+* 構築手順
+  * ディレクトリの作成
 ```bash
 $ cd
 $ mkdir -p catkin_ws/src
 $ cd ~/catkin_ws/src
 $ catkin_init_workspace 
-Creating symlink "/home/ubuntu/catkin_ws/src/CMakeLists.txt" pointing to "/opt/ros/melodic/share/catkin/cmake/toplevel.cmake"
+Creating symlink "/home/ubuntu/catkin_ws/src/CMakeLists.txt" pointing to 
+"/opt/ros/melodic/share/catkin/cmake/toplevel.cmake"
 $ ls
 CMakeLists.txt
 ```
@@ -149,58 +127,116 @@ $ echo $ROS_PACKAGE_PATH
 
 ---
 
-## ROSのノード
+## ROSパッケージ
 
-* プログラムのプロセス一つ一つが「ノード」と呼ばれる
-* ノードの使用例（`seiga-k/sysmon_ros`パッケージを使う）
-  * ハードウェアの状態をモニタするROSパッケージをインストール
+* ROS用のソフトウェアパッケージ
+* 利用方法
+  * `apt`でインストール
+  * ワークスペースでビルド<br />　
+* 例: ウェブカメラの映像をウェブブラウザに表示<br />（次ページから）
+  * USBのウェブカメラを持っている人は試してみましょう
+  * カメラ付きのUbuntu 20.04の入ったノートPCでもできます
+
+---
+
+## aptによるROSパッケージの<br />インストール
+
+* 手順
 ```
-$ sudo apt install ros-melodic-roslint 
-$ cd ~/catkin_ws/src
-$ git clone https://github.com/seiga-k/sysmon_ros.git
-$ cd ..
-$ catkin_make -j 1
-$ roscore &
-$ roslaunch sysmon_ros sysmon.launch 
+$ sudo apt install ros-noetic-cv-camera
+### おそらく不要だが念のため ###
+$ sudo apt install ros-noetic-cv-bridge
 ```
-  * ノードの確認
+  * ROS関係のパッケージをAPTで扱う設定: `step1.bash`が`/etc/apt/sources.list.d/ros-latest.list`に書き込み
+
+---
+
+## コードからのビルド
+
+* `web_video_server`というパッケージをGitHubから持ってくる
+  * Ubuntu 18.04以前では`apt`でインストール可能
+  * そのうちUbuntu 20.04でも可能になるはず
+
+```
+$ sudo apt install ffmpeg （いらないかもしれません）
+$ cd ~/catkin_ws/src/
+$ git clone https://github.com/GT-RAIL/async_web_server_cpp.git
+$ git clone https://github.com/RobotWebTools/web_video_server.git
+$ ( cd ~/catkin_ws/ && catkin_make -j 4 )
+### ↑ -j 4はCPUを4つ使うというパラメータ（非力なラズパイでは避ける） ###
+```
+
+
+---
+
+## 動作確認
+
+* `roscore`と`rosrun`でプログラムを立ち上げ
+  * ノード（後述）の通信を仲介する`roscore`を立ち上げ
+      ```
+      $ roscore &   ←「&」をつけてバックグラウンドで起動すると端末数が節約できる
+      ```
+  * カメラを立ち上げ
+      ```
+      $ ls /dev/video*
+      /dev/video0     ←ビデオのデバイスファイルがあるか確認
+      $ rosrun cv_camera cv_camera_node
+      ```
+  * サーバを立ち上げ
+      ```
+      $ rosrun web_video_server web_video_server
+      [ INFO] [1605588925.417323132]: Waiting For connections on 0.0.0.0:8080
+      ```
+* ブラウザで`http://ラズパイのIPアドレス:8080`にアクセスするとカメラの映像が確認できる
+
+
+---
+
+## ROSノード
+
+* ROS上で動くプログラムは 「ノード」と呼ばれる
+  * Unixで言う「プロセス」の言い換え
+  * 前のスライドの`cv_camera_node`と`web_video_server` <br />　
+* ノードは連携して動く
+  * `cv_camera_node`: カメラ画像をROS、OpenCV用の形式へ変換
+  * `web_video_server`: 変換されたデータをもらってウェブ配信
+
 ```
 ### ディレクトリのように管理されている ###
 $ rosnode list
+/cv_camera           ←cv_camera_nodeのノード
 /rosout
-/sysmon/cpumon
-/sysmon/diskmon
-/sysmon/memmon
-/sysmon/netmon
-/sysmon/tempmon
+/web_video_server    ←web_video_serverのノード
 ```
 
 ---
 
-## トピック・メッセージ
+## ROSトピックとメッセージ
 
 * 今度はrostopic listと打ってみる
   * データをやり取りする口（トピック）が表示される
 ```
 $ rostopic list
-/rosout
-/rosout_agg
-/sysmon/cpumon/cpu
-/sysmon/cpumon/cpu0
-/sysmon/cpumon/cpu1
-・・・
+/cv_camera/camera_info
+/cv_camera/image_raw
+（略）
 ```
 * トピックからデータを取り出す
   * このデータは「メッセージ」と呼ばれる
 ```
-$ rostopic echo /sysmon/netmon/eth0
-if_name: "eth0"
-ip: [192.168.2.20]
-tx_bps: 0
-rx_bps: 4432
-tx_error_rate: 0.0
-rx_error_rate: 0.0
-・・・
+$ rostopic echo /cv_camera/image_raw | head -c 300
+header:
+  seq: 36218
+  stamp:
+    secs: 1605590255
+    nsecs: 752682094
+  frame_id: "camera"
+height: 480
+width: 640
+encoding: "bgr8"
+is_bigendian: 0
+step: 1920
+data: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 2・・・
 ```
 
 ---
@@ -407,3 +443,25 @@ data: 1056
 * 参考
   * [小倉: ROSではじめるロボットプログラミング, 工学社, 2015.](https://www.kohgakusha.co.jp/books/detail/978-4-7775-1901-9)
   * [上田: Raspberry Piで学ぶ　ROSロボット入門, 日経BP, 2017.](http://ec.nikkeibp.co.jp/item/books/261040.html)
+
+--- 
+
+## デモ
+
+* カメラの画像をブラウザから見る
+* 手順
+  * 1: ROS・ワークスペースのセットアップ（来週）
+  * 2: 必要なパッケージのダウンロードとビルド
+    ```bash
+    $ sudo apt install ros-noetic-cv-camera
+    $ sudo apt install ros-noetic-cv-bridge  （必要なら）
+    $ sudo apt install ros-melodic-web-video-server
+    ```
+  * 3: 見る
+    ```
+    $ roscore &
+    $ rosrun cv_camera cv_camera_node &
+    $ rosrun web_video_server web_video_server
+    ブラウザでhttp://<IPアドレス>:8080/stream?topic=/cv_camera/image_raw
+    ```
+
