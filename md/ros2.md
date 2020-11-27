@@ -1,4 +1,4 @@
-# ロボットシステム学第12回
+# ロボットシステム学第11回
 
 上田 隆一
 
@@ -10,7 +10,8 @@
 
 * ROS2
 * 参考図書
-    * 近藤 豊: [ROS2ではじめよう 次世代ロボットプログラミング](https://gihyo.jp/book/2019/978-4-297-10742-0), 技術評論社, 2019. <br />　
+    * 近藤 豊: [ROS2ではじめよう 次世代ロボットプログラミング](https://gihyo.jp/book/2019/978-4-297-10742-0), 技術評論社, 2019. 
+    * 岡田 浩之: [ロボットプログラミングROS2入門 ](https://www.it-book.co.jp/books/107.html), 科学情報出版, 2020. <br />　
 * この講義では使えるようになるのが目標
     * 難しい話はしません
     * やること
@@ -31,16 +32,42 @@
 
 ---
 
+## ROS2のインストールの準備
+
+* ROS1がすでにインストールされている場合
+  * 方法1: 別のmicroSDカードを準備する
+  * 方法2:
+    * `.bashrc`から関係する記述をコメントアウト
+    * ターミナルを出る
+
+```
+$ tail ~/.bashrc
+（略）
+#source /opt/ros/noetic/setup.bash     ←ここから関係する設定をコメントアウト
+#source ~/catkin_ws/devel/setup.bash
+#export ROS_MASTER_URI=http://localhost:11311
+#export ROS_HOSTNAME=localhost
+```
+
+---
+
 ## ROS2のインストール
 
-* [インストールスクリプト](https://github.com/ryuichiueda/ros2_setup_scripts_Ubuntu18.04_desktop/blob/master/setup.bash)
+* [インストールスクリプト](https://github.com/ryuichiueda/ros2_setup_scripts/blob/master/setup.bash)
     * 手順は次の通り
+    * 余計なものを入れたくない場合は`setup.bash`の`ros-${ROS_VER}-desktop`を`ros-${ROS_VER}-base`に変更して実行
 
 ```bash
-$ git clone https://github.com/ryuichiueda/ros2_setup_scripts_Ubuntu18.04_desktop.git
-$ cd ros2_setup_scripts_Ubuntu18.04_desktop
+$ git clone https://github.com/ryuichiueda/ros2_setup_scripts
+$ cd ros2_setup_scripts
 $ ./setup.bash
 $ source ~/.bashrc
+### 動作確認 ###
+$ ros2
+usage: ros2 [-h] Call `ros2 <command> -h` for more detailed usage. ...
+
+ros2 is an extensible command-line tool for ROS 2.
+（以下略）
 ```
 
 ---
@@ -351,9 +378,7 @@ $ mkdir launch
 ```
     * `package.xml`に依存関係を記述
 ```
-・・・
  12   <exec_depend>launch_ros</exec_depend>
-・・・
 ```
 
 ---
@@ -400,4 +425,20 @@ $ ros2 launch mypkg talk_listen.launch.py
 （かなり遅れてlistener.pyの出力がまとめて表示される）
 （Ctrl+Cで修了）
 ```
+
+
+---
+
+## まとめ
+
+* ROS2
+  * ROS1より洗練されている
+    * `roscore`（ROSマスタ）がいらない
+    * PythonのパッケージがPythonのモジュールの作り方に準拠
+    * ・・・<br />　
+  * 基本的な考え方はROS1と変わらない
+    * トピック、サービス
+    * 疎結合
+    * ・・・<br />　
+* 操作方法だけでなく、考え方をしっかりおさえておくと後の変化に早く対応可能
 
