@@ -106,6 +106,7 @@ Pythonのものを作ってみましょう（[参考](https://index.ros.org/doc/
     * パッケージのビルド
     * パブリッシャの実装
     * サブスクライバの実装
+    * ローンチファイルの実装
 
 
 ---
@@ -283,6 +284,7 @@ mypkg
         entry_points={
         'console_scripts': [
             'talker = mypkg.talker:main',
+            #'listener = mypkg.listener:main', ←あとからコメントアウト
         ],
 ・・・
 ```
@@ -295,9 +297,9 @@ mypkg
 $ chmod +x talker.py
 ### 依存関係の確認 ###
 $ cd ~/ros2_ws
-$ sudo rosdep install -i --from-path src --rosdistro dashing -y
+$ sudo rosdep install -i --from-path src --rosdistro foxy -y
 ### ビルド ###
-$ colcon build --packages-select mypkg
+$ colcon build
 Starting >>> mypkg
 Finished <<< mypkg [2.55s]
 
@@ -347,7 +349,7 @@ data: 14
 ## <span style="text-transform:none">talker</span>と<span style="text-transform:none">listener</span>の実行
 
 ```
-### ビルドの手続きを済ませておく ###
+### setup.pyへの記述やビルドの手続きを済ませておく ###
 端末1$ ros2 run mypkg talker
 端末2$ ros2 run mypkg listener
 [INFO] [Listener]: Listen: 142
@@ -422,8 +424,8 @@ $ ros2 launch mypkg talk_listen.launch.py
 [INFO] [launch]: Default logging verbosity is set to INFO
 [INFO] [talker-1]: process started with pid [17158]
 [INFO] [listener-2]: process started with pid [17159]
-（かなり遅れてlistener.pyの出力がまとめて表示される）
-（Ctrl+Cで修了）
+（かなり遅れてlistener.pyの出力がまとめて表示される場合あり）
+（Ctrl+Cで終了）
 ```
 
 
