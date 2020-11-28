@@ -90,23 +90,32 @@ boot  etc  lib   media       opt  root  sbin  srv   tmp  var
 ## コンテナを使う
 
 * 講師の作成したコンテナのイメージ
-  * ROSの回のウェブカメラを使ったもの
-    * ラズパイでは動かないのでノートPCにLinux入っている人だけ
+  * ROSの回のウェブカメラを使った実演とおなじもの
+    * ラズパイで動作
+    * ノートPCで動かす場合は`:pi4`というタグを除去して実行
+  * 手元のブラウザでラズパイのカメラ映像が見える
+
+<span style="font-size:60%">
 
 ```
 $ sudo apt install docker.io                       <-dockerのインストール
-$ sudo docker pull ryuichiueda/ros-camera-server   <-コンテナのイメージのダウンロード
-Using default tag: latest
-latest: Pulling from ryuichiueda/ros-camera-server
-5b7339215d1d: Pull complete         <-左側の16進数は「レイヤ」のID
+### いきなり実行 ###
+$ sudo docker container run -p 8080:8080 --device=/dev/video0:/dev/video0 -t ryuichiueda/ros-camera-server:pi4
+Unable to find image 'ryuichiueda/ros-camera-server:pi4' locally
+pi4: Pulling from ryuichiueda/ros-camera-server
+04da93b342eb: Pull complete
 （略）
-0cfdd66c6555: Downloading  77.89MB/176.7MB
-3fffddebd6dc: Download complete
-f3127908e59a: Download complete
-### 実行 ###
-$ sudo docker container run -p 8080:8080 --device=/dev/video0:/dev/video0 -t ryuichiueda/ros-camera-server
+8a61eb997224: Extracting [===========================================>       ]  37.62MB/43.53MB
+f7c7d079b6f7: Download complete
+04e8904462b3: Downloading [================================>                  ]  227.7MB/355.4MB
+（略）
+started roslaunch server http://59b2685b9b37:44911/        <- ROSマスタが立ち上がる
+ros_comm version 1.14.10
+（略）
+[ INFO] [1606550046.573381331]: Waiting For connections on 0.0.0.0:8080  <-webサーバが立ち上がる
 ```
 
+</span>
 
 ---
 
