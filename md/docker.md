@@ -11,7 +11,6 @@
 * Dockerを使ってみる
 * Dockerのイメージを作ってみる
 
-
 ---
 
 ## <span style="text-transform:none">Docker</span>
@@ -84,7 +83,7 @@ boot  etc  lib   media       opt  root  sbin  srv   tmp  var
 * 条件が揃えばDockerのコンテナは他の環境でも動く
   * 別のバージョンのディストリビューション
   * 別のディストリビューション
-  * 別のOS
+  * 別のOS（の上で動くLinuxカーネル）
 
 ---
 
@@ -121,23 +120,37 @@ ros_comm version 1.14.10
 
 ---
 
-## コンテナとイメージの削除
+## コンテナの停止と削除
 
-* コンテナとイメージ（確認）
-  * イメージがインストールCDのようなもので、コンテナが動く実体
+* コンテナ: 今動いている隔離環境
 * 既存のコンテナの確認と削除
+
 ```
 $ sudo docker container list -a
-CONTAINER ID        IMAGE                               COMMAND                  CREATED             STATUS                      PORTS               NAMES
-59b2685b9b37        ryuichiueda/ros-camera-server:pi4   "bash /root/exec.bash"   41 hours ago        Exited (137) 39 hours ago                       friendly_mcnulty
+CONTAINER ID    IMAGE                               COMMAND                  
+CREATED         STATUS              PORTS                      NAMES
+59b2685b9b37    ryuichiueda/ros-camera-server:pi4   "bash /root/exec.bash"   
+29 minutes ago  Up 28 minutes       0.0.0.0:8080->8080/tcp     friendly_mcnulty
+$ sudo docker container stop 59b2
+59b2
 $ sudo docker container rm 59b2
 59b2
 ```
+
+---
+
+## イメージの削除
+
+* イメージ: コンテナを作るときのデータ
+  * インストールCDのようなもの
 * 既存のイメージの確認と削除
+
 ```
 $ sudo docker image list -a
-REPOSITORY                      TAG                 IMAGE ID            CREATED             SIZE
-ryuichiueda/ros-camera-server   pi4                 92e1a37aeca8        42 hours ago        1.74GB
+REPOSITORY                      TAG                 IMAGE ID            
+CREATED             SIZE
+ryuichiueda/ros-camera-server   pi4                 92e1a37aeca8        
+42 hours ago        1.74GB
 ubuntu@ubuntu:~$ sudo docker image rm 92e1
 Untagged: ryuichiueda/ros-camera-server:pi4
 Untagged: ryuichiueda/ros-camera-server@sha256:ce7483a3081180b4289d6c98a108a5e73e481cf749bab648e82e24403dcbda43
@@ -149,3 +162,160 @@ Untagged: ryuichiueda/ros-camera-server@sha256:ce7483a3081180b4289d6c98a108a5e73
 ## コンテナのイメージを作る
 
 * 今ダウンロードしたものと同じものを作ってみましょう 
+* 準備
+  * 作業ディレクトリを作成
+```
+$ mkdir camera-server
+$ cd camera-server/
+```
+
+---
+
+## <span style="text-transform:none">Dockerfile</span>
+
+* `Dockerfile`: イメージを作る手順書
+  * `make`における`Makefile`のようなもの
+* 最初の`Dockerfile`
+```
+$ cat Dockerfile
+FROM ryuichiueda/ubuntu18.04-pi4-ros-image
+```
+  * 元になるイメージを持ってくる
+* ビルドのコマンドが長いので`Makefile`も作っておきましょう
+  * インデントはタブで
+  * `-t`でイメージの名前を指定
+```
+$ cat Makefile
+build:
+	sudo docker image build . -t camera-server
+```
+
+---
+
+## ビルド
+
+* `ryuichiueda/ubuntu18.04-pi4-ros-image`と、そのベースになっているレイヤーがダウンロードされてビルドされる
+  * イメージはレイヤーが何層も重なったもの
+    * OverlayFSによって実現
+
+<span style="font-size:70%">
+
+```
+$ make
+sudo docker image build . -t camera-server
+Sending build context to Docker daemon  3.072kB
+Step 1/1 : FROM ryuichiueda/ubuntu18.04-pi4-ros-image
+latest: Pulling from ryuichiueda/ubuntu18.04-pi4-ros-image
+04da93b342eb: Extracting [==================================================>]  23.73MB/23.73MB
+b235194751de: Download complete
+606a67bb8db9: Download complete
+72d199f462f5: Download complete
+6ce64c3ad07d: Download complete
+8a61eb997224: Downloading [==============================>                    ]  26.61MB/43.53MB
+f7c7d079b6f7: Download complete
+04e8904462b3: Downloading [=>                                                 ]  10.24MB/355.4MB
+0cfd5c654b33: Download complete
+912911139a1f: Waiting
+0c42652750fc: Waiting
+```
+
+</span>
+
+---
+
+## ROSパッケージのインストール
+
+* セットアップのためのコマンドは`RUN`という命令で実行
+  * `Dockerfile`に書いて`make`するとダウンロードとインストールが始まる
+
+```
+$ cat Dockerfile
+FROM ryuichiueda/ubuntu18.04-pi4-ros-image
+
+RUN apt-get update && apt-get install -y \
+  ros-melodic-cv-camera \
+  ros-melodic-web-video-server
+```
+
+* 18.04のイメージを使っているのでROSのバージョンはmelodic
+  * ホストがUbuntu 20.04の場合、環境を18.04で作って20.04上で動かすことになる
+    * Linuxのバイナリの互換性のおかげでバージョン、ディストリビューション違いがあっても動く場合が多い
+
+---
+
+## 起動スクリプトの準備
+
+* ノードを立ち上げるスクリプトをリポジトリに置く
+  * `rosrun`よりも`roslaunch`を使ったほうがよいかもしれないが場合による
+
+```
+$ cat run.bash
+#!/bin/bash
+
+source /opt/ros/melodic/setup.bash
+
+roscore &
+sleep 5
+
+rosrun cv_camera cv_camera_node 2> /dev/null &
+rosrun web_video_server web_video_server
+```
+
+---
+
+## 起動スクリプトの設置
+
+
+* `Dockerfile`でスクリプトをイメージ内に移設、設定
+  * `COPY`: 外からイメージにファイルをコピー
+  * `CMD`: コンテナを実行すると走り出すプログラムを設定 
+  * 普通にコマンドを書いてもいいが、例ではリストを使って記述
+
+```
+$ cat Dockerfile
+・・・
+COPY ["run.bash", "/root/run.bash"]
+RUN ["chmod", "+x", "/root/run.bash"]
+CMD ["/root/run.bash"]
+```
+
+---
+
+## 起動
+
+* コマンドが長いので`Makefile`に書いてしまいましょう
+  * `make run`で起動
+    * シェルスクリプトに書くほうがよいかもしれない
+  * すべてのノードが立ち上がったらブラウザでカメラの映像を確認
+
+```
+$ cat Makefile
+・・・
+run:
+	sudo docker container run -p 8080:8080 --device=/dev/video0:/dev/video0 -t camera-server
+```
+
+* ポイント
+  * コンテナ内からはデバイスファイルもポートも見えないので、引数で見えるように設定
+    * 上の例: 8080番と`/dev/video0`
+
+---
+
+## 停止と再起動
+
+* 停止: [9ページ](/lesson12_docker.html#/8)
+```
+$ sudo docker container list
+CONTAINER ID        IMAGE               COMMAND             CREATED           ...
+d6134762c95b        camera-server       "/root/run.bash"    29 minutes ago    ...
+$ sudo docker container stop d613
+d613
+```
+* （再）起動: `docker container start`を使用
+```
+$ sudo docker container start d613
+d613
+```
+
+
+
