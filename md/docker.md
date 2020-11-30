@@ -21,7 +21,7 @@
   * 隔離環境にソフトウェアを詰め込んだもの
       * cgroup、OverlayFSやネームスペースの分離というLinuxの機能を駆使して隔離
   * コンテナの中ではソフトウェアが自由に動けるが、コンテナの外は見えない
-      * プロセス同士が仮想メモリの仕組みで互いにメモリを覗けない仕組みと類似
+      * プロセス同士が互いにメモリを覗けない仕組みと類似
 
 
 ---
@@ -79,7 +79,8 @@ boot  etc  lib   media       opt  root  sbin  srv   tmp  var
 
 * コンテナのイメージをダウンロードしたらすぐ使える
 * ホスト環境にいろいろインストールしなくてよい
-* 隔離の方法が仮想マシンより効率的
+* 気軽に立ち上げ、破棄可能
+* オーバーヘッドが少ない
 * 条件が揃えばDockerのコンテナは他の環境でも動く
   * 別のバージョンのディストリビューション
   * 別のディストリビューション
@@ -91,6 +92,7 @@ boot  etc  lib   media       opt  root  sbin  srv   tmp  var
 
 * 講師の作成したコンテナのイメージ
   * ROSの回のウェブカメラを使った実演とおなじもの
+    * [講師のDocker Hubのアカウント](https://hub.docker.com/u/ryuichiueda)にある
     * ラズパイで動作
     * ノートPCで動かす場合は`:pi4`というタグを除去して実行
   * 手元のブラウザでラズパイのカメラ映像が見える
@@ -119,6 +121,31 @@ ros_comm version 1.14.10
 
 ---
 
+## コンテナとイメージの削除
+
+* コンテナとイメージ（確認）
+  * イメージがインストールCDのようなもので、コンテナが動く実体
+* 既存のコンテナの確認と削除
+```
+$ sudo docker container list -a
+CONTAINER ID        IMAGE                               COMMAND                  CREATED             STATUS                      PORTS               NAMES
+59b2685b9b37        ryuichiueda/ros-camera-server:pi4   "bash /root/exec.bash"   41 hours ago        Exited (137) 39 hours ago                       friendly_mcnulty
+$ sudo docker container rm 59b2
+59b2
+```
+* 既存のイメージの確認と削除
+```
+$ sudo docker image list -a
+REPOSITORY                      TAG                 IMAGE ID            CREATED             SIZE
+ryuichiueda/ros-camera-server   pi4                 92e1a37aeca8        42 hours ago        1.74GB
+ubuntu@ubuntu:~$ sudo docker image rm 92e1
+Untagged: ryuichiueda/ros-camera-server:pi4
+Untagged: ryuichiueda/ros-camera-server@sha256:ce7483a3081180b4289d6c98a108a5e73e481cf749bab648e82e24403dcbda43
+（略）
+```
+
+---
+
 ## コンテナのイメージを作る
 
-* 
+* 今ダウンロードしたものと同じものを作ってみましょう 
