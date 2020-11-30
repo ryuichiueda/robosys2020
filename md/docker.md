@@ -187,7 +187,7 @@ FROM ryuichiueda/ubuntu18.04-pi4-ros-image
 ```
 $ cat Makefile
 build:
-	sudo docker image build . -t camera-server
+        sudo docker image build . -t camera-server
 ```
 
 ---
@@ -317,5 +317,36 @@ $ sudo docker container start d613
 d613
 ```
 
+---
 
+## <span style="text-transform:none">Docker Hubにリポジトリをpush</span>
 
+* 手順だけ示します
+  * 1. Docker Hubにサインアップ
+  * 2. `docker login`
+```
+$ sudo docker login
+Login with your Docker ID to push and pull images （略）
+Username: ryuichiueda
+Password:
+（略）
+Login Succeeded
+```
+  * 3. イメージの名前をきっちりつけてビルド
+    * 例: `sudo docker image build . -t ryuichiueda/camera-server:pi4`
+    * （`docker tag`で既存のものに名前をつけてもよい）
+  * 4. `docker push`
+```
+$ sudo docker push ryuichiueda/ros-camera-server:pi4
+```
+
+---
+
+## まとめ
+
+* コンテナ: アプリケーションを隔離した環境
+* Docker: 「コンテナ」を作ったり使ったりするためのソフトウェア/プラットフォーム
+  * 「プロセスを仮想メモリ空間に隔離」からさらに1段階抽象化が起こっている<br />　
+* 参考文献
+  * [Docker-docs-ja](https://docs.docker.jp/index.html)
+  * 山田明憲: Docker/Kubernetes 実践コンテナ開発入門, 技術評論社, 2018.
