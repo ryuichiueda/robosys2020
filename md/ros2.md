@@ -55,7 +55,7 @@ $ tail ~/.bashrc
 
 * [インストールスクリプト](https://github.com/ryuichiueda/ros2_setup_scripts/blob/master/setup.bash)
     * 手順は次の通り
-    * 余計なものを入れたくない場合は`setup.bash`の`ros-${ROS_VER}-desktop`を`ros-${ROS_VER}-base`に変更して実行
+    * 余計なものを入れたくない場合は`setup.bash`の`ros-${ROS_VER}-desktop`を`ros-${ROS_VER}-ros-base`に変更して実行
 
 ```bash
 $ git clone https://github.com/ryuichiueda/ros2_setup_scripts
