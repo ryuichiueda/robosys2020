@@ -476,5 +476,5 @@ data: 1056
 ## 参考文献
 
 * [小倉: ROSではじめるロボットプログラミング, 工学社, 2015.](https://www.kohgakusha.co.jp/books/detail/978-4-7775-1901-9)
-* [上田: Raspberry Piで学ぶ　ROSロボット入門, 日経BP, 2017.](http://ec.nikkeibp.co.jp/item/books/261040.html)
+* [上田: Raspberry Piで学ぶ　ROSロボット入門, 日経BP, 2017.](https://www.nikkeibp.co.jp/atclpubmkt/book/17/261040/)
 
