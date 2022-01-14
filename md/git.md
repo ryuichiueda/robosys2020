@@ -146,8 +146,8 @@ $ ls -a
 ```bash
 $ git add hoge.bash
 $ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
+On branch main
+Your branch is up-to-date with 'origin/main'.
 Changes to be committed:
   (use "git reset HEAD <file>..." to unstage)
 new file:   hoge.bash
@@ -163,17 +163,17 @@ $ git commit -m "Add a file"
 
 * ローカルのコミットをリモートへ反映
   * origin: リモートのリポジトリのこと
-  * master: masterブランチ
+  * main: mainブランチ
 
 ```bash
-$ git push origin master
+$ git push origin main
 Counting objects: 3, done.
 Delta compression using up to 4 threads.
 Compressing objects: 100% (2/2), done.
 Writing objects: 100% (3/3), 333 bytes | 0 bytes/s, done.
 Total 3 (delta 0), reused 0 (delta 0)
 To https://github.com/ryuichiueda/test.git
-   b09eefb..9da0223  master -> master
+   b09eefb..9da0223  main -> main
 ```
 
 ---
@@ -182,10 +182,10 @@ To https://github.com/ryuichiueda/test.git
 
 * ディレクトリの中の状態を分岐したもの
   * ブランチ = 枝
-* 今のところブランチは「master」だけ
+* 2020/10/01 からデフォルトのブランチ名が「master」から「main」に変更になりました
   ```bash
-  $ git branch
-  * master
+  ・$ git branch
+  * main
   ```
 * 開発用ブランチを作りましょう
   ```bash
@@ -193,7 +193,7 @@ To https://github.com/ryuichiueda/test.git
   Switched to a new branch 'dev'
   $ git branch
   * dev
-    master
+    main
   ```
 
 ---
@@ -212,14 +212,14 @@ To https://github.com/ryuichiueda/test.git
   [dev ce996b6] Add another hoge
    1 file changed, 1 insertion(+), 1 deletion(-)
   ```
-* masterブランチに戻ってみましょう
+* mainブランチに戻ってみましょう
   ```bash
-  $ git checkout master
-  Switched to branch 'master'
-  Your branch is up-to-date with 'origin/master'.
+  $ git checkout main
+  Switched to branch 'main'
+  Your branch is up-to-date with 'origin/main'.
   $ git branch
     dev
-  * master
+  * main
   ```
 
 
@@ -233,7 +233,7 @@ To https://github.com/ryuichiueda/test.git
   #!/bin/bash
   echo hoge
   ```
-* devの成果をmasterに取り込む
+* devの成果をmainに取り込む
   ```bash
   $ git merge dev
   Updating 9da0223..ce996b6
@@ -243,9 +243,9 @@ To https://github.com/ryuichiueda/test.git
   ```
 * ついでにpushしておきましょう
   ```bash
-  $ git push   #masterのpushは2回目以降、これで良い
+  $ git push   #mainのpushは2回目以降、これで良い
   ```
-* master以外のブランチもリモートにpush可能 
+* main以外のブランチもリモートにpush可能 
 
 ---
 
@@ -284,7 +284,7 @@ To https://github.com/ryuichiueda/test.git
   remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0
   Unpacking objects: 100% (3/3), done.
   From https://github.com/ryuichiueda/test
-     ce996b6..ff549b7  master     -> origin/master
+     ce996b6..ff549b7  main     -> origin/main
   Updating ce996b6..ff549b7
   Fast-forward
    hoge.bash | 1 +
