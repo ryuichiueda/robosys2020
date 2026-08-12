@@ -43,6 +43,11 @@ app.get("/", function(req, res) {
 });
 
 app.get("/token", function(req,res) {
+	var ip = req.ip || req.connection.remoteAddress;
+	if (ip !== '127.0.0.1' && ip !== '::1' && ip !== '::ffff:127.0.0.1') {
+		res.status(403).send('Forbidden');
+		return;
+	}
 	var ts = new Date().getTime();
 	var rand = Math.floor(Math.random()*9999999);
 	var secret = ts.toString() + rand.toString();
@@ -50,8 +55,7 @@ app.get("/token", function(req,res) {
 });
 
 var createHash = function(secret) {
-	var cipher = crypto.createCipher('blowfish', secret);
-	return(cipher.final('hex'));
+	return crypto.createHash('sha256').update(secret).digest('hex');
 };
 
 // Actually listen
