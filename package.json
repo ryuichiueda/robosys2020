@@ -39,7 +39,7 @@
   "license": "MIT",
   "dependencies": {
     "gulp-sass": "^5.1.0",
-    "npm": "^8.19.2",
+    "npm": "^12.0.2",
     "shelljs": "^0.8.4"
   },
   "bugs": {
